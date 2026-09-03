@@ -1,27 +1,15 @@
-# GLOBAL SPARK HQ v0.5.0
+# GLOBAL SPARK HQ v0.6.0 — Minimal Update
 
-GLOBAL SPARK의 **실운영 Supabase 연결 직전 MVP**입니다.
+이번 버전에서 독립 GLOBAL SPARK Supabase 프로젝트의 Project URL과 Publishable key를 브라우저 설정에 연결했습니다.
 
-## 포함
-- HQ 공개화면
-- SPARK CENTER 한 손 입력 프로토타입
-- MY SPARK
-- 계명태권도 제1호 실증센터
-- SYSTEM STATUS
-- 안전한 데이터 어댑터(local demo → Supabase-ready)
-- Activity → 공식 XP → append-only ledger SQL 검토안
-- 중복 이벤트 방지용 source_event_id 설계
+## 실제 연결 상태
+- Project URL 설정 완료
+- Publishable key 설정 완료
+- 브라우저 Secret/service_role key 없음
+- REST/RPC 호출 가능한 데이터 어댑터 준비
+- `spark_register_activity` RPC 계약 초안 추가
+- RPC/RLS가 아직 배포되지 않은 경우 기존 로컬 저장으로 안전하게 폴백
 
-## 중요한 안전 원칙
-현재 버전은 실제 Supabase 원격 쓰기를 의도적으로 켜지 않았습니다.
-`supabase/drafts/`는 자동 배포 migration이 아닙니다.
-
-실제 연결 전에 반드시 확인:
-1. GLOBAL SPARK 전용 Supabase 프로젝트인지
-2. 센터/회원 실제 스키마
-3. RLS 및 지도자 권한
-4. 미성년자 개인정보 공개범위
-5. 활동+XP ledger를 하나의 RPC transaction으로 처리
-6. service_role key가 프런트/GitHub에 없는지
-
-CLASS STAR, 계명 성장포인트, GLOBAL SPARK XP는 서로 독립적으로 유지합니다.
+## 중요
+이 버전은 기존 ACTS, Global News24, CLASS, IDP Supabase를 전혀 참조하지 않습니다.
+실제 DB 테이블/RLS/RPC 생성은 별도 검토 후 진행해야 합니다.
