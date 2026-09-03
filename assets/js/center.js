@@ -1,5 +1,5 @@
 (function(){
-  const VERSION='v1.0.0';
+  const VERSION='v1.2.0';
   const behaviorDefs=[
     ['🏠','부모님 돕기','help_parents'],
     ['🤝','친구 배려','care_friend'],
@@ -70,7 +70,7 @@
         logout(); showToast('로그인 세션이 만료되었습니다. 다시 로그인해 주세요.');
       } else {
         setConnection('DB 연결 오류');
-        showToast('센터 회원을 불러오지 못했습니다. v1.0.0 SQL 패치를 확인해 주세요.',4500);
+        showToast('센터 회원을 불러오지 못했습니다. v1.2.0 SQL 패치를 확인해 주세요.',4500);
       }
     }
   }
@@ -205,4 +205,22 @@
   $('confirmModal').addEventListener('click',e=>{if(e.target===$('confirmModal'))closeConfirm();});
 
   enterCenter();
+
+  async function loadCenterGrowth(){
+    try{
+      const d=await SparkData.getCenterGrowth();
+      $('cgToday').textContent=d.today_count||0;
+      $('cgWeek').textContent=d.week_count||0;
+      $('cgXp').textContent=d.total_xp||0;
+      $('cgMembers').textContent=d.active_members||0;
+      const goal=Math.max(20,Number(d.week_goal||20));
+      const count=Number(d.week_count||0);
+      const pct=Math.min(100,Math.round(count/goal*100));
+      $('cgBar').style.width=pct+'%';
+      $('cgGoalText').textContent=`이번 주 공동목표 ${goal}건 중 ${count}건 · ${pct}% 달성`;
+    }catch(e){console.error(e);}
+  }
+  $('refreshCenterGrowthBtn').onclick=loadCenterGrowth;
+
+  loadCenterGrowth();
 })();
