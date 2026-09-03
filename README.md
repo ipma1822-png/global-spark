@@ -1,25 +1,57 @@
-# GLOBAL SPARK PHASE 2-2 · v2.2.0
+# GLOBAL SPARK PHASE 2-3 · v2.3.0
 
-이번 버전은 기존 실운영 기능을 보존하면서 운영기준 v1.0의 공식 콘텐츠와 정상 진입동선을 반영한 최소 업데이트입니다.
+현재 GLOBAL SPARK는 기존 KMT 실운영 기반을 보존하면서 5대 불꽃 성장경험과 SPARK MISSION v1.0을 연결한 단계입니다.
 
-## 반영 내용
-- 전 연령 글로벌 성장운동 공식 정의
-- GOOD·SAFE·EARTH·CHALLENGE·CITIZEN 5대 불꽃 소개
-- 개인·가족·센터·단체·외부 시스템 연동 참여방향
-- SPARK MISSION과 전문단체 협력 원칙
-- SAFE 활동의 위험회피·신고·대피 우선 원칙
-- 계명태권도 제1호 어린이·청소년 실증센터 설명
-- 메인 → 로그인 → 나의 센터 → 센터 선택 → 센터 운영 동선
-- 실제 Supabase 운영상태에 맞춘 안내
+## PHASE 2-3 핵심
+- 센터 인증 세션이 만료되어 RPC가 401을 반환하면 refresh token으로 access token을 1회 갱신하고 요청을 재시도합니다.
+- HQ ADMIN에서 GOOD·SAFE·EARTH·CHALLENGE·CITIZEN 대표 불꽃 MISSION을 작성·수정·공개·종료할 수 있습니다.
+- MY SPARK에서 현재 공개된 MISSION과 완료 여부, 안전안내를 확인할 수 있습니다.
+- SPARK CENTER에서 회원을 선택한 뒤 현실 행동 완료를 지도자가 확인할 수 있습니다.
+- PHASE 2-3의 MISSION 완료는 확인 기록만 남기며 별도 XP를 지급하지 않습니다.
+- 기존 활동 XP, LEVEL, append-only ledger, UNDO, KMT CLASS Connector는 변경하지 않습니다.
 
-## 중요
-이번 단계에서는 데이터베이스·RPC·XP·LEVEL·UNDO·부모 공유토큰·KMT CLASS Connector를 변경하지 않습니다.
+## 역할별 운영·검수 동선
 
-## PHASE 2-2
+### 일반 방문자
+`index.html` → GLOBAL SPARK 소개 / 5대 불꽃 / MISSION 운영상태 확인
 
-- 기존 9개 활동규칙에 단일 대표 불꽃(`flame_code`)을 추가했습니다.
-- MY SPARK에 성장 이미지, 다음 LEVEL 진행률, 5대 불꽃 현황, 최근 성장과 다음 현실 행동 안내를 연결했습니다.
-- 화면 연출 자산은 `assets/spark/`와 `assets/js/spark-growth-config.js`에 분리해 공식 디자인으로 쉽게 교체할 수 있습니다.
-- 기존 활동코드·XP·원장·UNDO·KMT CLASS Connector와 기존 RPC는 변경하지 않았습니다.
+### SPARK CENTER 지도자
+`my-centers.html` → 지도자 로그인 → 나의 센터 → 센터 운영 시작 → `center.html?center=...`
 
-개인·가족 독립 참여, MISSION DB와 참여·승인 기능, 최종 캐릭터·배지·아이템·사운드는 후속 단계입니다.
+센터 화면에서 회원·활동·MISSION을 확인합니다.
+
+### 기존 센터회원 MY SPARK
+현재 회원 본인용 독립 로그인은 아직 개발 전입니다.
+센터 지도자가 `my-spark.html`에서 회원을 선택해 MY SPARK를 확인하거나, 부모 공유링크를 발급합니다.
+
+### 부모
+센터 지도자가 MY SPARK에서 만든 난수 공유링크 → `parent-spark.html?share=...`
+
+### HQ 관리자
+`hq-admin.html` → 본부 관리자 로그인 → 센터 신청 관리 / SPARK MISSION v1.0 관리
+
+### 시스템 상태
+`system-status.html`
+
+## SPARK MISSION v1.0 데이터
+- `spark_missions`
+- `spark_mission_completions`
+- 대표 불꽃 1개
+- 대상 표시
+- 난이도
+- 참여형태: 혼자 / 친구 / 가족 / 센터 / 지역사회
+- 시작·종료기간
+- 안전안내
+- 상태: 초안 / 공개 / 종료
+
+MISSION 완료 자체에는 현재 XP가 연결되지 않습니다. 향후 공식 정책 확정 후 기존 XP 원장 원칙을 훼손하지 않는 방식으로 별도 검토합니다.
+
+## 현재 원칙
+
+> 서버는 계산하고, 화면은 연출한다.
+
+> 현실에서 행동하면 나의 SPARK가 성장하고, 그 과정에서 실제 나도 성장한다.
+
+> 경쟁보다 연결, 점수보다 행동, 보상보다 성장.
+
+개인 독립 참여, 가족 참여, 공식 캐릭터·배지·아이템·사운드는 후속 단계입니다.
