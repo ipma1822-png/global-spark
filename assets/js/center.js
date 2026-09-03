@@ -1,5 +1,5 @@
 (function(){
-  const VERSION='v0.8.0';
+  const VERSION='v0.9.0';
   const behaviorDefs=[
     ['🏠','부모님 돕기','help_parents'],
     ['🤝','친구 배려','care_friend'],
@@ -70,7 +70,7 @@
         logout(); showToast('로그인 세션이 만료되었습니다. 다시 로그인해 주세요.');
       } else {
         setConnection('DB 연결 오류');
-        showToast('센터 회원을 불러오지 못했습니다. v0.8.0 SQL 패치를 확인해 주세요.',4500);
+        showToast('센터 회원을 불러오지 못했습니다. v0.9.0 SQL 패치를 확인해 주세요.',4500);
       }
     }
   }
@@ -100,6 +100,7 @@
     $('selectedStudent').textContent=selectedStudent?selectedStudent.display_name:'선택 안 됨';
     $('selectedBehavior').textContent=selectedBehavior?selectedBehavior.label:'선택 안 됨';
     $('registerBtn').disabled=!(selectedStudent&&selectedBehavior);
+    $('openMySparkBtn').disabled=!selectedStudent;
   }
   function openConfirm(student,behavior,source='touch'){
     pending={student,behavior,source};
@@ -195,6 +196,10 @@
   $('studentSearch').addEventListener('input',e=>renderStudents(e.target.value));
   $('clearSearch').onclick=()=>{$('studentSearch').value='';renderStudents('');};
   $('registerBtn').onclick=()=>openConfirm(selectedStudent,selectedBehavior,'touch');
+  $('openMySparkBtn').onclick=()=>{
+    if(!selectedStudent)return;
+    location.href=`my-spark.html?member=${encodeURIComponent(selectedStudent.id)}`;
+  };
   $('cancelConfirm').onclick=closeConfirm;$('confirmSave').onclick=commit;
   $('undoBtn').onclick=undo;$('voiceBtn').onclick=startVoice;
   $('confirmModal').addEventListener('click',e=>{if(e.target===$('confirmModal'))closeConfirm();});

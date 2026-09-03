@@ -1,24 +1,19 @@
-# GLOBAL SPARK v0.8.0 — Minimal Update
+# GLOBAL SPARK v0.9.0 — Minimal Update
 
-이번 버전은 **SPARK CENTER 실제 로그인 + 실제 Supabase 활동등록** MVP입니다.
+이번 버전은 **아이별 실제 MY SPARK 연결** 단계입니다.
 
-## 실제 흐름
-1. `center.html`에서 Supabase Auth 지도자 계정 로그인
-2. `KMT-000001` 계명태권도 실제 회원 목록 RPC 로드
-3. 아이 선택
-4. 좋은 행동 선택
-5. `spark_register_activity()` 호출
-6. 서버 공식 규칙으로 XP 자동 계산
-7. `spark_activities` + append-only `spark_ledger` 실제 DB 기록
-8. 최근 활동/UNDO/`MY SPARK` 확인
-
-## GitHub 업로드 후 필수 1회
-GLOBAL SPARK Supabase SQL Editor에서:
-`supabase/manual/PATCH-v0.8.0-LIVE-MVP.sql`
-내용을 실행하세요.
+## 추가
+- SPARK CENTER에서 선택한 아이의 MY SPARK 바로 열기
+- `my-spark.html?member=<UUID>` 아이별 실시간 조회
+- 센터 회원 선택 드롭다운
+- 누적 XP / LEVEL / 다음 LEVEL까지 남은 XP
+- LEVEL 진행률 바
+- 최근 좋은 행동 최대 20건
+- 실증용 성장 배지 표시
+- 아이별 링크 복사
 
 ## 중요
-- 지도자 이메일/비밀번호는 소스에 저장하지 않습니다.
-- Secret/service_role key는 포함하지 않습니다.
-- CLASS STAR / 계명 성장포인트 / GLOBAL SPARK XP는 계속 독립입니다.
-- 현재 MY SPARK는 제1호 실증기간의 지도자 확인용 화면입니다. 부모/아이 공개 간편링크는 후속 단계에서 별도 권한모델로 만듭니다.
+현재 개인 링크는 로그인된 실증 지도자용입니다.
+미성년자의 부모/아이에게 배포할 **무로그인 공개 링크**는 UUID를 그대로 공개하지 않고, 다음 단계에서 별도의 안전한 공유 토큰/RPC 구조로 구현합니다.
+
+이번 v0.9.0은 DB 스키마 변경이 없으므로 Supabase SQL 실행이 필요 없습니다.
