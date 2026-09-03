@@ -2,61 +2,32 @@
  const $=id=>document.getElementById(id);
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const labels={new:'신규',reviewing:'검토중',approved:'승인',rejected:'거절'};
+ const missionStatus={draft:'초안',published:'공개',ended:'종료'};
+ const pLabels={solo:'혼자',friends:'친구와',family:'가족과',center:'센터와',community:'지역사회와'};
+ let missions=[];
  async function load(){
    $('requestList').innerHTML='<p class="empty">불러오는 중…</p>';
    try{
      const rows=await SparkData.hqGetCenterInterests($('statusFilter').value);
-     $('requestList').innerHTML=rows.length?rows.map(r=>`
-       <article class="req" data-id="${r.id}">
-         <div class="req-head"><div><span class="status">${labels[r.status]||r.status}</span><h3>${esc(r.organization_name)}</h3><small>${new Date(r.created_at).toLocaleString('ko-KR')}</small></div><div>${esc(r.center_type)}</div></div>
-         <div class="req-meta">
-           <div><b>지역</b><br>${esc(r.region_name)}</div>
-           <div><b>담당자</b><br>${esc(r.contact_name)} · ${esc(r.contact_phone)}</div>
-           <div><b>이메일</b><br>${esc(r.contact_email||'-')}</div>
-         </div>
-         ${r.message?`<p>${esc(r.message)}</p>`:''}
-         ${r.review_note?`<p class="tiny">본부 메모: ${esc(r.review_note)}</p>`:''}
-         <div class="actions">
-           <input class="review-note" placeholder="본부 메모 (선택)">
-           <button class="secondary act" data-action="reviewing">검토중</button>
-           <button class="primary act" data-action="approved">승인</button>
-           <button class="secondary act" data-action="rejected">거절</button>
-         </div>
-       </article>`).join(''):'<p class="empty">해당 신청이 없습니다.</p>';
+     $('requestList').innerHTML=rows.length?rows.map(r=>`<article class="req" data-id="${r.id}"><div class="req-head"><div><span class="status">${labels[r.status]||r.status}</span><h3>${esc(r.organization_name)}</h3><small>${new Date(r.created_at).toLocaleString('ko-KR')}</small></div><div>${esc(r.center_type)}</div></div><div class="req-meta"><div><b>지역</b><br>${esc(r.region_name)}</div><div><b>담당자</b><br>${esc(r.contact_name)} · ${esc(r.contact_phone)}</div><div><b>이메일</b><br>${esc(r.contact_email||'-')}</div></div>${r.message?`<p>${esc(r.message)}</p>`:''}${r.review_note?`<p class="tiny">본부 메모: ${esc(r.review_note)}</p>`:''}<div class="actions"><input class="review-note" placeholder="본부 메모 (선택)"><button class="secondary act" data-action="reviewing">검토중</button><button class="primary act" data-action="approved">승인</button><button class="secondary act" data-action="rejected">거절</button></div></article>`).join(''):'<p class="empty">해당 신청이 없습니다.</p>';
    }catch(e){console.error(e);$('requestList').innerHTML='<p class="empty">본부 권한이 없거나 데이터를 불러오지 못했습니다.</p>';}
  }
- $('hqLoginBtn').onclick=async()=>{
-   try{
-     await SparkData.signIn($('hqEmail').value.trim(),$('hqPassword').value);
-     $('loginBox').hidden=true;$('adminBox').hidden=false;await load();
-   }catch(e){console.error(e);$('hqLoginMsg').textContent='로그인 또는 본부 관리자 권한을 확인해 주세요.';}
- };
- $('refreshRequestsBtn').onclick=load;
- $('statusFilter').onchange=load;
- $('requestList').addEventListener('click',async e=>{
-   const btn=e.target.closest('.act'); if(!btn)return;
-   const card=btn.closest('.req'); const note=card.querySelector('.review-note').value.trim();
-   if(!confirm(`이 신청을 '${btn.textContent}' 상태로 변경할까요?`))return;
-   btn.disabled=true;
-   try{
-     if(btn.dataset.action==='approved'){
-       const r=await SparkData.hqApproveAndCreateCenter(card.dataset.id,note);
-       alert(`승인 완료! 공식 센터번호: ${r.center_code}`);
-     }else{
-       await SparkData.hqReviewCenterInterest(card.dataset.id,btn.dataset.action,note);
-     }
-     await load();
-   }catch(err){console.error(err);alert('처리에 실패했습니다. 본부 관리자 권한 또는 신청 상태를 확인해 주세요.');}
-   finally{btn.disabled=false;}
- });
- if(SparkData.isSignedIn()){ $('loginBox').hidden=true;$('adminBox').hidden=false;load(); }
-
- $('assignLeaderBtn').onclick=async()=>{
-   const code=$('leaderCenterCode').value.trim(), email=$('leaderEmail').value.trim();
-   if(!code||!email){$('leaderAssignMsg').textContent='센터번호와 지도자 이메일을 입력해 주세요.';return;}
-   try{
-     const r=await SparkData.hqAssignCenterLeader(code,email);
-     $('leaderAssignMsg').textContent=`🔥 연결 완료 · ${r.center_code} · ${r.email}`;
-   }catch(err){console.error(err);$('leaderAssignMsg').textContent='연결 실패: Auth에 해당 이메일 사용자가 있는지 확인해 주세요.';}
- };
+ function toLocalInput(v){if(!v)return'';const d=new Date(v);const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
+ function clearMission(){$('missionId').value='';$('missionTitle').value='';$('missionTarget').value='어린이·청소년';$('missionDescription').value='';$('missionFlame').value='GOOD';$('missionDifficulty').value='easy';$('missionParticipation').value='solo';$('missionEndsAt').value='';$('missionSafety').value='';$('missionMsg').textContent='새 MISSION을 작성할 수 있습니다.'}
+ async function loadMissions(){
+  $('missionAdminList').innerHTML='<p class="empty">MISSION 불러오는 중…</p>';
+  try{
+   missions=await SparkData.hqMissions();
+   $('missionAdminList').innerHTML=missions.length?missions.map(m=>`<article class="mission-admin-card" data-id="${m.id}"><div class="mission-head"><div><span class="status">${missionStatus[m.status]||m.status}</span><h3>${esc(m.title)}</h3></div><b>${esc(m.flame_code)}</b></div><div class="mission-meta"><div><b>대상</b><br>${esc(m.target_label)}</div><div><b>형태</b><br>${esc(pLabels[m.participation_type]||m.participation_type)}</div><div><b>난이도</b><br>${esc(m.difficulty)}</div></div><p>${esc(m.description)}</p>${m.safety_guide?`<p class="tiny">🛡 ${esc(m.safety_guide)}</p>`:''}<div class="actions"><button class="secondary edit-mission">수정</button>${m.status!=='published'?'<button class="primary status-mission" data-status="published">공개</button>':''}${m.status!=='ended'?'<button class="secondary status-mission" data-status="ended">종료</button>':''}${m.status!=='draft'?'<button class="secondary status-mission" data-status="draft">초안</button>':''}</div></article>`).join(''):'<p class="empty">아직 등록된 MISSION이 없습니다.</p>';
+  }catch(e){console.error(e);$('missionAdminList').innerHTML='<p class="empty">MISSION 목록을 불러오지 못했습니다.</p>';}
+ }
+ function openMission(m){$('missionId').value=m.id;$('missionTitle').value=m.title;$('missionTarget').value=m.target_label||'모두';$('missionDescription').value=m.description;$('missionFlame').value=m.flame_code;$('missionDifficulty').value=m.difficulty;$('missionParticipation').value=m.participation_type;$('missionEndsAt').value=toLocalInput(m.ends_at);$('missionSafety').value=m.safety_guide||'';$('missionMsg').textContent='기존 MISSION 수정 중';window.scrollTo({top:$('missionAdminBox').offsetTop-20,behavior:'smooth'})}
+ $('hqLoginBtn').onclick=async()=>{try{await SparkData.signIn($('hqEmail').value.trim(),$('hqPassword').value);$('loginBox').hidden=true;$('adminBox').hidden=false;$('missionAdminBox').hidden=false;await Promise.all([load(),loadMissions()])}catch(e){console.error(e);$('hqLoginMsg').textContent='로그인 또는 본부 관리자 권한을 확인해 주세요.'}};
+ $('refreshRequestsBtn').onclick=load;$('statusFilter').onchange=load;$('refreshMissionsBtn').onclick=loadMissions;$('clearMissionBtn').onclick=clearMission;
+ $('saveMissionBtn').onclick=async()=>{const title=$('missionTitle').value.trim(),description=$('missionDescription').value.trim();if(title.length<2||description.length<2){$('missionMsg').textContent='제목과 설명을 입력해 주세요.';return}const ends=$('missionEndsAt').value?new Date($('missionEndsAt').value).toISOString():null;try{await SparkData.hqSaveMission({id:$('missionId').value||null,title,description,flame_code:$('missionFlame').value,target_label:$('missionTarget').value.trim()||'모두',difficulty:$('missionDifficulty').value,participation_type:$('missionParticipation').value,safety_guide:$('missionSafety').value.trim(),starts_at:null,ends_at:ends});$('missionMsg').textContent='MISSION을 저장했습니다. 초안 상태이며 목록에서 공개할 수 있습니다.';clearMission();await loadMissions()}catch(e){console.error(e);$('missionMsg').textContent='MISSION 저장에 실패했습니다.'}};
+ $('missionAdminList').onclick=async e=>{const card=e.target.closest('.mission-admin-card');if(!card)return;const m=missions.find(x=>x.id===card.dataset.id);if(e.target.closest('.edit-mission')){openMission(m);return}const btn=e.target.closest('.status-mission');if(!btn)return;if(!confirm(`MISSION 상태를 '${missionStatus[btn.dataset.status]}'로 변경할까요?`))return;try{await SparkData.hqSetMissionStatus(card.dataset.id,btn.dataset.status);await loadMissions()}catch(err){console.error(err);alert('MISSION 상태 변경에 실패했습니다.')}};
+ $('requestList').addEventListener('click',async e=>{const btn=e.target.closest('.act');if(!btn)return;const card=btn.closest('.req');const note=card.querySelector('.review-note').value.trim();if(!confirm(`이 신청을 '${btn.textContent}' 상태로 변경할까요?`))return;btn.disabled=true;try{if(btn.dataset.action==='approved'){const r=await SparkData.hqApproveAndCreateCenter(card.dataset.id,note);alert(`승인 완료! 공식 센터번호: ${r.center_code}`)}else{await SparkData.hqReviewCenterInterest(card.dataset.id,btn.dataset.action,note)}await load()}catch(err){console.error(err);alert('처리에 실패했습니다. 본부 관리자 권한 또는 신청 상태를 확인해 주세요.')}finally{btn.disabled=false}});
+ $('assignLeaderBtn').onclick=async()=>{const code=$('leaderCenterCode').value.trim(),email=$('leaderEmail').value.trim();if(!code||!email){$('leaderAssignMsg').textContent='센터번호와 지도자 이메일을 입력해 주세요.';return}try{const r=await SparkData.hqAssignCenterLeader(code,email);$('leaderAssignMsg').textContent=`🔥 연결 완료 · ${r.center_code} · ${r.email}`}catch(err){console.error(err);$('leaderAssignMsg').textContent='연결 실패: Auth에 해당 이메일 사용자가 있는지 확인해 주세요.'}};
+ if(SparkData.isSignedIn()){ $('loginBox').hidden=true;$('adminBox').hidden=false;$('missionAdminBox').hidden=false;Promise.all([load(),loadMissions()]); }
+ clearMission();
 })();
