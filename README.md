@@ -1,15 +1,34 @@
-# GLOBAL SPARK HQ v0.6.0 — Minimal Update
+# GLOBAL SPARK HQ v0.7.0 — Minimal Update
 
-이번 버전에서 독립 GLOBAL SPARK Supabase 프로젝트의 Project URL과 Publishable key를 브라우저 설정에 연결했습니다.
+이번 단계는 **실제 GLOBAL SPARK Supabase MVP 데이터베이스 설치 패키지**입니다.
 
-## 실제 연결 상태
-- Project URL 설정 완료
-- Publishable key 설정 완료
-- 브라우저 Secret/service_role key 없음
-- REST/RPC 호출 가능한 데이터 어댑터 준비
-- `spark_register_activity` RPC 계약 초안 추가
-- RPC/RLS가 아직 배포되지 않은 경우 기존 로컬 저장으로 안전하게 폴백
+## 추가된 실제 운영 구조
+- `spark_centers`
+- `spark_members`
+- `spark_center_staff`
+- `spark_activity_rules`
+- `spark_activities`
+- `spark_ledger` (append-only)
+- RLS
+- 센터 지도자 권한
+- `spark_register_activity` 트랜잭션 RPC
+- `spark_get_center_members`
+- `spark_get_member_summary`
+- 계명태권도 `KMT-000001` 제1호 실증센터 seed
 
-## 중요
-이 버전은 기존 ACTS, Global News24, CLASS, IDP Supabase를 전혀 참조하지 않습니다.
-실제 DB 테이블/RLS/RPC 생성은 별도 검토 후 진행해야 합니다.
+## 보안 원칙
+익명 사용자는 회원·활동·XP에 직접 쓰지 못합니다.
+지도자는 Supabase Auth 로그인 후 자기 센터만 접근합니다.
+브라우저는 XP 숫자를 전송하지 않습니다. 서버가 공식 규칙에서 XP를 읽습니다.
+
+## 설치
+GitHub 업로드 후 GLOBAL SPARK Supabase SQL Editor에서
+`supabase/manual/INSTALL-v0.7.0.sql`
+내용을 **GLOBAL SPARK / global-spark 프로젝트에서만** 한 번 실행합니다.
+
+그 다음:
+1. 지도자 Auth 계정 생성/로그인
+2. `STAFF-GRANT-TEMPLATE-v0.7.0.sql`
+3. `MEMBER-IMPORT-TEMPLATE-v0.7.0.sql`
+
+ACTS, Global News24, CLASS, IDP 프로젝트에서는 절대 실행하지 마세요.

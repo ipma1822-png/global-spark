@@ -1,81 +1,79 @@
-// GLOBAL SPARK HQ v0.6.0
-// Remote-capable data adapter for the independent GLOBAL SPARK Supabase project.
-// Browser uses only publishable key. No secret/service_role key belongs here.
+// GLOBAL SPARK HQ v0.7.0
+// Authenticated Supabase MVP adapter.
 (function () {
   const LOCAL_KEY = "globalSparkActivities";
+  const SESSION_KEY = "globalSparkSession";
   const cfg = window.SPARK_CONFIG || {};
   const configured = !!(cfg.supabaseUrl && cfg.supabaseAnonKey);
 
-  function localRead() {
-    try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch (_) { return []; }
+  function readSession() {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); } catch (_) { return null; }
   }
-  function localWrite(rows) { localStorage.setItem(LOCAL_KEY, JSON.stringify(rows)); }
+  function saveSession(s) {
+    if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+    else localStorage.removeItem(SESSION_KEY);
+  }
+  function token() {
+    const s = readSession();
+    return s?.access_token || cfg.supabaseAnonKey || "";
+  }
 
-  async function rest(path, options={}) {
-    const url = cfg.supabaseUrl.replace(/\/$/,"") + "/rest/v1/" + path.replace(/^\//,"");
+  async function api(path, options={}) {
+    const base = cfg.supabaseUrl.replace(/\/$/,"");
+    const url = base + path;
     const headers = {
       "apikey": cfg.supabaseAnonKey,
-      "Authorization": "Bearer " + cfg.supabaseAnonKey,
+      "Authorization": "Bearer " + token(),
       "Content-Type": "application/json",
-      "Prefer": options.prefer || "return=representation",
       ...(options.headers || {})
     };
     const res = await fetch(url, {...options, headers});
-    if (!res.ok) throw new Error(await res.text() || ("HTTP " + res.status));
     const text = await res.text();
-    return text ? JSON.parse(text) : null;
+    let body = null;
+    try { body = text ? JSON.parse(text) : null; } catch (_) { body = text; }
+    if (!res.ok) throw new Error(typeof body === "string" ? body : JSON.stringify(body));
+    return body;
   }
 
-  async function rpc(name, body) {
-    return rest("rpc/" + name, {method:"POST", body:JSON.stringify(body || {})});
+  async function signIn(email, password) {
+    const body = await api("/auth/v1/token?grant_type=password", {
+      method:"POST", body:JSON.stringify({email,password})
+    });
+    saveSession(body);
+    return body;
+  }
+  function signOut() { saveSession(null); }
+
+  async function rpc(name, payload) {
+    return api("/rest/v1/rpc/" + name, {
+      method:"POST",
+      headers:{"Prefer":"return=representation"},
+      body:JSON.stringify(payload || {})
+    });
   }
 
-  async function listLocal() { return localRead(); }
-
-  async function addLocal(activity) {
-    const rows = localRead();
-    const row = {
-      id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
-      created_at: new Date().toISOString(),
-      ...activity,
-      sync_status: configured ? "pending" : "local"
-    };
-    rows.unshift(row); localWrite(rows); return row;
+  async function getCenterMembers(centerCode=cfg.centerCode) {
+    return rpc("spark_get_center_members", {p_center_code:centerCode});
   }
 
-  async function add(activity) {
-    // Preferred production route: one transactional RPC that validates center/member,
-    // resolves official XP rule and appends both activity + ledger.
-    if (configured && activity.member_id && activity.activity_type) {
-      try {
-        const result = await rpc("spark_register_activity", {
-          p_member_id: activity.member_id,
-          p_center_code: activity.center_code || cfg.centerCode,
-          p_activity_type: activity.activity_type,
-          p_memo: activity.memo || null,
-          p_source_event_id: activity.source_event_id || null
-        });
-        return {remote:true, result};
-      } catch (err) {
-        console.warn("GLOBAL SPARK remote registration unavailable; stored locally.", err);
-      }
-    }
-    return addLocal(activity);
+  async function registerActivity({member_id, activity_type, memo=null, source_event_id=null}) {
+    return rpc("spark_register_activity", {
+      p_member_id:member_id,
+      p_center_code:cfg.centerCode,
+      p_activity_type:activity_type,
+      p_memo:memo,
+      p_source_event_id:source_event_id
+    });
   }
 
-  async function undoLast() {
-    // Undo remains local-only until a reviewed server-side reversal RPC exists.
-    const rows = localRead();
-    const removed = rows.shift(); localWrite(rows); return removed || null;
+  async function getMemberSummary(memberId) {
+    return rpc("spark_get_member_summary", {p_member_id:memberId});
   }
 
   window.SparkData = {
-    mode: configured ? "supabase-connected" : "local-demo",
     configured,
-    list: listLocal,
-    add,
-    undoLast,
-    rest,
-    rpc
+    mode: configured ? "supabase-auth-mvp" : "local-demo",
+    readSession, signIn, signOut, rpc,
+    getCenterMembers, registerActivity, getMemberSummary
   };
 })();
