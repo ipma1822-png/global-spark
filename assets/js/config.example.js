@@ -1,4 +1,4 @@
-// GLOBAL SPARK HQ v0.4.0
+// GLOBAL SPARK HQ v0.5.0
 // Copy to config.js only when connecting the independent GLOBAL SPARK Supabase project.
 // Never place service_role keys in browser code.
 window.SPARK_CONFIG = {

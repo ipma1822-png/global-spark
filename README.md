@@ -1,22 +1,27 @@
-# GLOBAL SPARK HQ v0.4.0
+# GLOBAL SPARK HQ v0.5.0
 
-Official MVP foundation for the GLOBAL SPARK MOVEMENT.
+GLOBAL SPARK의 **실운영 Supabase 연결 직전 MVP**입니다.
 
-> 휴대폰이 없어도 누구나 좋은 행동과 도전을 인정받을 수 있는 글로벌 성장운동.
+## 포함
+- HQ 공개화면
+- SPARK CENTER 한 손 입력 프로토타입
+- MY SPARK
+- 계명태권도 제1호 실증센터
+- SYSTEM STATUS
+- 안전한 데이터 어댑터(local demo → Supabase-ready)
+- Activity → 공식 XP → append-only ledger SQL 검토안
+- 중복 이벤트 방지용 source_event_id 설계
 
-## v0.4.0
-- Public HQ homepage
-- SPARK CENTER one-hand input prototype
-- MY SPARK prototype
-- First pilot center page: 계명태권도 / Ulsan / Korea / No.000001
-- Independent Supabase connection template (no secrets)
-- Draft core schema + first-center seed
-- Supabase safety/connection checklist
+## 중요한 안전 원칙
+현재 버전은 실제 Supabase 원격 쓰기를 의도적으로 켜지 않았습니다.
+`supabase/drafts/`는 자동 배포 migration이 아닙니다.
 
-## Safety
-`supabase/drafts/` contains review-only SQL. It is intentionally not an auto-deploy migration.
-Existing CLASS, ACTS, Global News24 and IDP systems are not modified.
+실제 연결 전에 반드시 확인:
+1. GLOBAL SPARK 전용 Supabase 프로젝트인지
+2. 센터/회원 실제 스키마
+3. RLS 및 지도자 권한
+4. 미성년자 개인정보 공개범위
+5. 활동+XP ledger를 하나의 RPC transaction으로 처리
+6. service_role key가 프런트/GitHub에 없는지
 
-## Next
-After the independent GLOBAL SPARK Supabase project credentials/schema are verified:
-activity → rule-based XP → append-only ledger → MY SPARK → center stats.
+CLASS STAR, 계명 성장포인트, GLOBAL SPARK XP는 서로 독립적으로 유지합니다.

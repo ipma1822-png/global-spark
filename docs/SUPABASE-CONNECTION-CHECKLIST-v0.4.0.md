@@ -1,4 +1,4 @@
-# GLOBAL SPARK Supabase 연결 체크리스트 — v0.4.0
+# GLOBAL SPARK Supabase 연결 체크리스트 — v0.5.0
 
 ## 목적
 GLOBAL SPARK 전용 Supabase 프로젝트에만 연결한다. 기존 계명태권도 CLASS, ACTS, Global News24, IDP 데이터베이스는 수정하지 않는다.

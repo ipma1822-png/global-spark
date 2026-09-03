@@ -1,4 +1,4 @@
--- GLOBAL SPARK HQ v0.4.0
+-- GLOBAL SPARK HQ v0.5.0
 -- DRAFT ONLY. Do not auto-run.
 -- First pilot center: Keimyung Taekwondo / Korea / Ulsan.
 -- Run only after 001_core_schema.sql has been reviewed and adapted to the real project.
