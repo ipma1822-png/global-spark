@@ -1,29 +1,46 @@
-<!doctype html><html lang="ko"><head>
+<!doctype html>
+<html lang="ko">
+<head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SPARK CENTER · v1.9.0</title><link rel="stylesheet" href="assets/css/style.css">
+<title>SPARK CENTER · v1.10.0</title>
+<link rel="stylesheet" href="assets/css/style.css">
 <style>
-.wrap{max-width:1100px;margin:auto}.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
-.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.panel{padding:18px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}
-.member-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.member-btn,.rule-btn{padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:#111827;color:#fff;text-align:left}.member-btn.active,.rule-btn.active{outline:2px solid #ff9f1c}
-.rule-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.recent{display:grid;gap:9px}.recent-item{padding:12px;border-radius:12px;background:rgba(255,255,255,.035);display:flex;justify-content:space-between;gap:10px}.memo{width:100%;padding:12px;border-radius:12px;background:#0f172a;color:#fff;border:1px solid rgba(255,255,255,.14);box-sizing:border-box}
-.flash{font-size:1.5rem;font-weight:800;color:#ffb347;min-height:32px}
-@media(max-width:800px){.grid{grid-template-columns:1fr}.member-grid,.rule-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.member-grid,.rule-grid{grid-template-columns:1fr}}
-</style></head><body>
-<header class="site-header"><a class="brand" href="my-centers.html">🔥 <b>SPARK CENTER</b></a><div class="version-pill">v1.9.0</div></header>
-<main class="container wrap">
-<section class="hero compact"><div class="topbar"><div><p class="eyebrow">MULTI-CENTER REAL OPERATION</p><h1 id="centerTitle">센터 운영</h1><p class="lead">아이의 좋은 행동을 발견하고 공식 SPARK XP로 기록합니다.</p></div><a class="btn secondary" id="manageMembersLink" href="#">아이 관리</a></div></section>
-<section class="grid">
- <div class="panel">
-   <h2>1. 아이 선택</h2><div id="memberGrid" class="member-grid"><p class="empty">불러오는 중…</p></div>
-   <h2 style="margin-top:18px">2. 좋은 행동</h2><div id="ruleGrid" class="rule-grid"><p class="empty">불러오는 중…</p></div>
-   <h2 style="margin-top:18px">3. 메모 (선택)</h2><input id="activityMemo" class="memo" maxlength="200" placeholder="예: 친구 신발 정리를 도와줌">
-   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button id="registerBtn" class="primary" type="button">🔥 SPARK 등록</button><button id="undoBtn" class="secondary" type="button">UNDO</button></div>
-   <div id="flashMsg" class="flash"></div>
+:root{--panel:#121a2d;--line:rgba(255,255,255,.10);--hot:#ff9f1c}
+body{min-height:100vh}
+.spark-shell{max-width:1280px;margin:auto;padding:18px}
+.spark-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.spark-head h1{margin:0;font-size:clamp(22px,3vw,36px)} .ver{border:1px solid #9a6724;border-radius:999px;padding:7px 11px;font-size:12px}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.75fr);gap:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px}
+.step{font-size:14px;letter-spacing:.02em;margin:0 0 10px}.members{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.member{min-height:82px;border:1px solid var(--line);border-radius:17px;background:#0e1628;color:white;padding:13px;text-align:left;cursor:pointer}
+.member b{display:block;font-size:18px}.member small{opacity:.7}.member.active{outline:3px solid var(--hot);transform:translateY(-1px)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.rule{min-height:72px;border:1px solid var(--line);border-radius:16px;background:#0e1628;color:#fff;padding:12px;text-align:left;cursor:pointer}
+.rule b{display:block;font-size:16px}.rule small{color:#ffc56f}.rule.active{outline:3px solid var(--hot)}
+.memo{width:100%;box-sizing:border-box;border-radius:14px;padding:13px;background:#0d1526;border:1px solid var(--line);color:#fff}
+.actions{display:grid;grid-template-columns:1fr auto auto;gap:9px;margin-top:12px}
+.fire-btn{border:0;border-radius:16px;background:#ff9f1c;padding:15px 18px;font-weight:900;font-size:17px;cursor:pointer}.voice,.undo{border:1px solid var(--line);border-radius:16px;background:#1a2540;color:#fff;padding:12px 15px;cursor:pointer}.undo{font-size:12px}
+.status{min-height:30px;margin-top:9px;font-weight:800;color:#ffb347}.recent{display:grid;gap:8px;max-height:650px;overflow:auto}.recent-item{background:#0d1526;border-radius:14px;padding:12px;display:flex;justify-content:space-between;gap:10px}.recent-item small{display:block;opacity:.65;margin-top:3px}
+.success-pop{position:fixed;inset:0;display:none;place-items:center;background:rgba(3,8,20,.58);z-index:50;pointer-events:none}.success-pop.show{display:grid}.success-card{background:#111a2d;border:2px solid #ff9f1c;border-radius:28px;padding:30px 45px;text-align:center;box-shadow:0 0 70px rgba(255,159,28,.35);animation:pop .25s ease-out}.success-card .flame{font-size:64px}.success-card strong{display:block;font-size:30px}.success-card span{font-size:22px;color:#ffb347}
+@keyframes pop{from{transform:scale(.72);opacity:.2}to{transform:scale(1);opacity:1}}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.recent{max-height:360px}.members{grid-template-columns:repeat(2,1fr)}.rules{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.spark-shell{padding:10px}.panel{padding:13px;border-radius:18px}.spark-head{align-items:flex-start}.members{grid-template-columns:repeat(2,1fr)}.member{min-height:74px}.rules{grid-template-columns:repeat(2,1fr)}.rule{min-height:68px}.actions{grid-template-columns:1fr auto}.undo{grid-column:2}.voice{grid-column:1}.fire-btn{grid-column:1/-1;grid-row:1;font-size:20px;padding:17px}.success-card{width:78%;padding:25px 15px}}
+</style>
+</head>
+<body>
+<div class="spark-shell">
+ <header class="spark-head"><div><small>🔥 GLOBAL SPARK · FIELD CENTER</small><h1 id="centerTitle">SPARK CENTER</h1></div><div class="ver">v1.10.0</div></header>
+ <div class="layout">
+  <main class="panel">
+   <h2 class="step">1. 아이 선택</h2><div id="memberGrid" class="members">불러오는 중…</div>
+   <h2 class="step" style="margin-top:20px">2. 좋은 행동</h2><div id="ruleGrid" class="rules">불러오는 중…</div>
+   <h2 class="step" style="margin-top:20px">3. 메모 <small>(선택)</small></h2><input id="activityMemo" class="memo" maxlength="200" placeholder="예: 친구 신발 정리를 도와줌">
+   <div class="actions"><button id="registerBtn" class="fire-btn">🔥 SPARK 등록</button><button id="voiceBtn" class="voice">🎙 음성</button><button id="undoBtn" class="undo">UNDO</button></div>
+   <div id="status" class="status"></div>
+  </main>
+  <aside class="panel"><h2 class="step">센터 최근 SPARK</h2><div id="recentList" class="recent">불러오는 중…</div></aside>
  </div>
- <div class="panel">
-   <h2>센터 최근 SPARK</h2><div id="recentList" class="recent"><p class="empty">불러오는 중…</p></div>
- </div>
-</section>
-</main>
-<script src="assets/js/config.js"></script><script src="assets/js/spark-data.js"></script><script src="assets/js/center.js"></script></body></html>
+</div>
+<div id="successPop" class="success-pop"><div class="success-card"><div class="flame">🔥</div><strong id="successName"></strong><span id="successXp">+5 XP</span></div></div>
+<script src="assets/js/config.js"></script><script src="assets/js/spark-data.js"></script><script src="assets/js/center.js"></script>
+</body></html>

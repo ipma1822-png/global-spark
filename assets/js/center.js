@@ -1,44 +1,18 @@
 (function(){
- const $=id=>document.getElementById(id);
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const qs=new URLSearchParams(location.search), center=qs.get('center');
- let members=[],rules=[],selectedMember=null,selectedRule=null;
- if(!center){$('centerTitle').textContent='센터번호가 없습니다';$('flashMsg').textContent='MY CENTER에서 다시 들어와 주세요.';return;}
- $('centerTitle').textContent=`${center} · SPARK 입력`;
- $('manageMembersLink').href=`center-members.html?center=${encodeURIComponent(center)}`;
- function renderMembers(){
-   $('memberGrid').innerHTML=members.filter(m=>m.active).map(m=>`<button class="member-btn ${selectedMember===m.id?'active':''}" data-id="${m.id}"><b>${esc(m.display_name)}</b><br><small>${esc(m.member_code||'')}</small></button>`).join('')||'<p class="empty">재원 아이가 없습니다.</p>';
- }
- function renderRules(){
-   $('ruleGrid').innerHTML=rules.map(r=>`<button class="rule-btn ${selectedRule===r.activity_type?'active':''}" data-type="${esc(r.activity_type)}"><b>${esc(r.label_ko)}</b><br><small>+${r.xp} XP</small></button>`).join('');
- }
- async function loadRecent(){
-   try{
-     const rows=await SparkData.centerGetRecent(center,20);
-     $('recentList').innerHTML=rows.length?rows.map(r=>`<div class="recent-item"><div><b>${esc(r.display_name)} · ${esc(r.label_ko)}</b><small>${new Date(r.created_at).toLocaleString('ko-KR')}</small></div><div>+${r.net_xp} XP</div></div>`).join(''):'<p class="empty">최근 활동이 없습니다.</p>';
-   }catch(e){console.error(e);$('recentList').innerHTML='<p class="empty">최근 활동을 불러오지 못했습니다.</p>';}
- }
- async function load(){
-   try{
-     [members,rules]=await Promise.all([SparkData.centerGetMembers(center),SparkData.centerGetRules()]);
-     renderMembers();renderRules();await loadRecent();
-   }catch(e){console.error(e);$('flashMsg').textContent='이 센터에 대한 지도자 권한을 확인해 주세요.';}
- }
- $('memberGrid').onclick=e=>{const b=e.target.closest('.member-btn');if(!b)return;selectedMember=b.dataset.id;renderMembers();};
- $('ruleGrid').onclick=e=>{const b=e.target.closest('.rule-btn');if(!b)return;selectedRule=b.dataset.type;renderRules();};
- $('registerBtn').onclick=async()=>{
-   if(!selectedMember||!selectedRule){$('flashMsg').textContent='아이와 좋은 행동을 선택해 주세요.';return;}
-   try{
-     const r=await SparkData.centerRegisterActivity(center,selectedMember,selectedRule,$('activityMemo').value.trim());
-     $('flashMsg').textContent=`🔥 +${r.xp} XP · SPARK 등록 완료`;
-     $('activityMemo').value='';await loadRecent();
-     setTimeout(()=>{$('flashMsg').textContent='';},2200);
-   }catch(e){console.error(e);$('flashMsg').textContent='등록에 실패했습니다. 권한과 선택값을 확인해 주세요.';}
- };
- $('undoBtn').onclick=async()=>{
-   if(!confirm('이 센터의 가장 최근 SPARK 기록을 되돌릴까요?'))return;
-   try{const r=await SparkData.centerUndoLast(center,selectedMember);$('flashMsg').textContent=`UNDO 완료 · -${r.reversed_xp} XP`;await loadRecent();}
-   catch(e){console.error(e);$('flashMsg').textContent='되돌릴 기록이 없거나 권한이 없습니다.';}
- };
- load();
+const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const center=new URLSearchParams(location.search).get('center'); let members=[],rules=[],member=null,rule=null;
+if(!center){$('status').textContent='MY CENTER에서 센터를 선택해 주세요.';return;}
+$('centerTitle').textContent=center+' · SPARK 입력';
+function drawMembers(){$('memberGrid').innerHTML=members.filter(x=>x.active).map(x=>`<button class="member ${member===x.id?'active':''}" data-id="${x.id}"><b>${esc(x.display_name)}</b><small>${esc(x.member_code||'')}</small></button>`).join('')||'등록된 아이가 없습니다.'}
+function drawRules(){$('ruleGrid').innerHTML=rules.map(x=>`<button class="rule ${rule===x.activity_type?'active':''}" data-type="${esc(x.activity_type)}"><b>${esc(x.label_ko)}</b><small>+${x.xp} XP</small></button>`).join('')}
+async function recent(){try{const a=await SparkData.centerGetRecent(center,30);$('recentList').innerHTML=a.length?a.map(x=>`<div class="recent-item"><div><b>${esc(x.display_name)} · ${esc(x.label_ko)}</b><small>${new Date(x.created_at).toLocaleString('ko-KR')}</small></div><b>+${x.net_xp} XP</b></div>`).join(''):'최근 기록이 없습니다.'}catch(e){$('recentList').textContent='최근 기록을 불러오지 못했습니다.'}}
+async function load(){try{[members,rules]=await Promise.all([SparkData.centerGetMembers(center),SparkData.centerGetRules()]);drawMembers();drawRules();recent()}catch(e){console.error(e);$('status').textContent='센터 지도자 로그인과 권한을 확인해 주세요.'}}
+$('memberGrid').onclick=e=>{const b=e.target.closest('.member');if(b){member=b.dataset.id;drawMembers()}};
+$('ruleGrid').onclick=e=>{const b=e.target.closest('.rule');if(b){rule=b.dataset.type;drawRules()}};
+function selectedName(){return members.find(x=>x.id===member)?.display_name||''}
+function pop(xp){$('successName').textContent=selectedName();$('successXp').textContent='+'+xp+' XP';$('successPop').classList.add('show');setTimeout(()=>$('successPop').classList.remove('show'),1100)}
+$('registerBtn').onclick=async()=>{if(!member||!rule){$('status').textContent='아이와 좋은 행동을 선택해 주세요.';return} try{const r=await SparkData.centerRegisterActivity(center,member,rule,$('activityMemo').value.trim());$('status').textContent=`🔥 ${selectedName()} +${r.xp} XP · 등록 완료`;pop(r.xp);$('activityMemo').value='';await recent()}catch(e){console.error(e);$('status').textContent='등록에 실패했습니다. 로그인/권한을 확인해 주세요.'}};
+$('undoBtn').onclick=async()=>{if(!confirm('선택한 아이의 최근 SPARK 기록을 되돌릴까요?'))return;try{const r=await SparkData.centerUndoLast(center,member);$('status').textContent=`UNDO 완료 · -${r.reversed_xp} XP`;await recent()}catch(e){$('status').textContent='되돌릴 기록이 없습니다.'}};
+$('voiceBtn').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('status').textContent='이 브라우저는 음성 인식을 지원하지 않습니다.';return}const sr=new SR();sr.lang='ko-KR';sr.interimResults=false;$('status').textContent='🎙 말씀하세요. 예: 김민규 친구 배려';sr.onresult=e=>{const t=e.results[0][0].transcript.replace(/\s/g,'');const m=members.find(x=>t.includes(String(x.display_name).replace(/\s/g,'')));const rr=rules.find(x=>t.includes(String(x.label_ko).replace(/[·\s]/g,'')));if(m)member=m.id;if(rr)rule=rr.activity_type;drawMembers();drawRules();$('status').textContent=(m&&rr)?`🎙 ${m.display_name} · ${rr.label_ko} 선택 완료 — SPARK 등록을 눌러주세요.`:'음성에서 아이 또는 행동을 찾지 못했습니다.'};sr.onerror=()=>{$('status').textContent='음성 인식을 다시 시도해 주세요.'};sr.start()};
+load();
 })();
