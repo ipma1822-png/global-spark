@@ -1,4 +1,4 @@
-// GLOBAL SPARK HQ v1.7.0
+// GLOBAL SPARK HQ v1.9.0
 // Authenticated Supabase MVP adapter for the independent GLOBAL SPARK project.
 (function () {
   const SESSION_KEY = "globalSparkSession.v080";
@@ -140,6 +140,27 @@
   async function getMyCenters() {
     return rpc("spark_get_my_centers", {});
   }
+  async function centerGetMembers(centerCode) {
+    return rpc("spark_center_admin_get_members", {p_center_code:centerCode});
+  }
+  async function centerCreateMember(centerCode, displayName) {
+    return rpc("spark_center_admin_create_member", {p_center_code:centerCode,p_display_name:displayName});
+  }
+  async function centerUpdateMember(memberId, displayName, active) {
+    return rpc("spark_center_admin_update_member", {p_member_id:memberId,p_display_name:displayName,p_active:active});
+  }
+  async function centerGetRules() {
+    return rpc("spark_center_get_rules", {});
+  }
+  async function centerRegisterActivity(centerCode, memberId, activityType, memo="") {
+    return rpc("spark_center_register_activity_v190", {p_center_code:centerCode,p_member_id:memberId,p_activity_type:activityType,p_memo:memo});
+  }
+  async function centerGetRecent(centerCode, limit=20) {
+    return rpc("spark_center_recent_v190", {p_center_code:centerCode,p_limit:limit});
+  }
+  async function centerUndoLast(centerCode, memberId=null) {
+    return rpc("spark_center_undo_last_v190", {p_center_code:centerCode,p_member_id:memberId});
+  }
 
   window.SparkData = {
     configured,
@@ -147,6 +168,6 @@
     readSession, isSignedIn, signIn, signOut,
     rpc, getCenterMembers, registerActivity,
     getMemberSummary, getMemberRecent, getCenterRecent, undoLast,
-    createMemberShare, revokeMemberShares, getPublicShare, getCenterGrowth, getPublicLive, findPublicCenters, submitCenterInterest, hqGetCenterInterests, hqReviewCenterInterest, hqApproveAndCreateCenter, hqAssignCenterLeader, getMyCenters, publicRpc
+    createMemberShare, revokeMemberShares, getPublicShare, getCenterGrowth, getPublicLive, findPublicCenters, submitCenterInterest, hqGetCenterInterests, hqReviewCenterInterest, hqApproveAndCreateCenter, hqAssignCenterLeader, getMyCenters, centerGetMembers, centerCreateMember, centerUpdateMember, centerGetRules, centerRegisterActivity, centerGetRecent, centerUndoLast, publicRpc
   };
 })();
