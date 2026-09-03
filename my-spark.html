@@ -1,7 +1,7 @@
 <!doctype html><html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111827">
-<title>MY SPARK · v1.1.0</title><link rel="stylesheet" href="assets/css/style.css">
+<title>MY SPARK · PHASE 2-1 · v2.1.0</title><link rel="stylesheet" href="assets/css/style.css">
 <style>
 .my-head{display:grid;gap:16px}.my-select{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .my-select select{min-width:220px;padding:11px 12px;border-radius:12px}
@@ -21,12 +21,12 @@
 }.badge-chip{padding:10px 12px;border-radius:999px;background:rgba(255,159,28,.12);border:1px solid rgba(255,159,28,.35)}
 </style></head>
 <body>
-<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK</b></a><div class="version-pill">MY SPARK v1.1.0</div></header>
+<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK</b></a><div class="version-pill">PHASE 2-1 · v2.1.0</div></header>
 <main class="container">
 <section class="hero compact my-head">
   <div><p class="eyebrow">MY SPARK · PILOT LIVE VIEW</p><h1 id="memberName">불러오는 중…</h1>
   <p class="lead">좋은 행동이 쌓일수록 나의 SPARK가 성장합니다.</p></div>
-  <div class="my-select"><label for="memberSelect">아이 선택</label><select id="memberSelect"></select><button id="copyLinkBtn" class="secondary" type="button">🔗 이 아이 링크 복사</button></div>
+  <div class="my-select"><label for="memberSelect">회원 선택</label><select id="memberSelect"></select><button id="copyLinkBtn" class="secondary" type="button">🔗 회원 링크 복사</button></div>
 </section>
 
 <section class="section spark-identity">
@@ -49,11 +49,11 @@
 <section class="section">
   <p class="eyebrow">BADGES · PREVIEW</p><h2>현재 성장 표시</h2>
   <div id="badgeRow" class="badge-row"></div>
-  <p class="tiny">v1.1.0에서는 누적 XP 기준의 실증용 표시입니다. 공식 배지 규칙은 후속 버전에서 별도 확정합니다.</p>
+  <p class="tiny">현재 누적 XP 기준의 성장 미리보기이며, 공식 배지 규칙은 후속 단계에서 별도 확정합니다.</p>
 </section>
 
-<section class="section"><h2>최근 좋은 행동</h2><div id="myRecent" class="recent-list"><p class="empty">불러오는 중…</p></div></section>
-<section class="section"><h2>개인 확인 링크</h2><div class="share-box"><input id="shareUrl" readonly><button id="shareCopyBtn" class="secondary" type="button">복사</button></div><p class="tiny">현재 v1.1.0 링크는 실증용입니다. 부모 공개용 무로그인 링크는 별도 보안 토큰 방식으로 다음 단계에서 만듭니다.</p></section>
+<section class="section"><h2>최근 SPARK 활동</h2><div id="myRecent" class="recent-list"><p class="empty">불러오는 중…</p></div></section>
+<section class="section"><h2>센터회원 확인 링크</h2><div class="share-box"><input id="shareUrl" readonly><button id="shareCopyBtn" class="secondary" type="button">복사</button></div><p class="tiny">이 링크는 로그인된 센터 지도자용입니다. 보호자에게는 아래의 안전한 공유링크를 사용합니다.</p></section>
 
 <section class="section">
   <p class="eyebrow">PARENT SHARE</p>
@@ -70,7 +70,7 @@
   <p class="tiny">공유링크는 해당 아이의 이름·XP·LEVEL·최근 좋은 행동만 읽을 수 있고, 센터 관리기능이나 다른 아이 정보에는 접근할 수 없습니다.</p>
 </section>
 
-<p><a class="btn secondary" href="center.html">← SPARK CENTER</a></p>
+<p><a class="btn secondary" href="my-centers.html">← 나의 SPARK CENTER</a></p>
 </main>
 <div id="toast" class="toast" hidden></div>
 <script src="assets/js/config.js"></script><script src="assets/js/spark-data.js"></script><script src="assets/js/my-spark.js"></script>

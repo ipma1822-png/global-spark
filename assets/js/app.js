@@ -1,10 +1,11 @@
-(function(){
-  const key='globalSpark.activities.v020';
+(async function(){
+  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value??0);};
   try{
-    const rows=JSON.parse(localStorage.getItem(key)||'[]');
-    const today=new Date().toISOString().slice(0,10);
-    const count=rows.filter(r=>r.date===today).length;
-    const el=document.getElementById('todaySpark');
-    if(el) el.textContent=String(count);
-  }catch(e){}
+    const data=await window.SparkData.getPublicLive();
+    set('todaySpark',data.today_count);
+    set('activeCenters',data.active_centers);
+    set('totalSparkXp',data.total_xp);
+  }catch(e){
+    console.error('GLOBAL SPARK LIVE summary unavailable',e);
+  }
 })();
