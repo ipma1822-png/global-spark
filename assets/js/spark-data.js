@@ -1,4 +1,4 @@
-// GLOBAL SPARK HQ v0.8.0
+// GLOBAL SPARK HQ v1.1.0
 // Authenticated Supabase MVP adapter for the independent GLOBAL SPARK project.
 (function () {
   const SESSION_KEY = "globalSparkSession.v080";
@@ -61,6 +61,25 @@
     });
   }
 
+  async function publicRpc(name, payload={}) {
+    const saved = readSession();
+    const base = cfg.supabaseUrl.replace(/\/$/,"");
+    const res = await fetch(base + "/rest/v1/rpc/" + name, {
+      method:"POST",
+      headers:{
+        "apikey":cfg.supabaseAnonKey,
+        "Authorization":"Bearer " + cfg.supabaseAnonKey,
+        "Content-Type":"application/json",
+        "Prefer":"return=representation"
+      },
+      body:JSON.stringify(payload)
+    });
+    const text=await res.text();
+    let body=null; try{body=text?JSON.parse(text):null;}catch(_){body=text;}
+    if(!res.ok) throw new Error(typeof body==="string"?body:JSON.stringify(body));
+    return body;
+  }
+
   async function getCenterMembers(centerCode=cfg.centerCode) {
     return rpc("spark_get_center_members", {p_center_code:centerCode});
   }
@@ -85,12 +104,22 @@
   async function undoLast() {
     return rpc("spark_undo_last_activity", {p_center_code:cfg.centerCode});
   }
+  async function createMemberShare(memberId) {
+    return rpc("spark_create_member_share", {p_member_id:memberId});
+  }
+  async function revokeMemberShares(memberId) {
+    return rpc("spark_revoke_member_shares", {p_member_id:memberId});
+  }
+  async function getPublicShare(token) {
+    return publicRpc("spark_get_public_share", {p_token:token});
+  }
 
   window.SparkData = {
     configured,
     mode: configured ? "supabase-live-v080" : "not-configured",
     readSession, isSignedIn, signIn, signOut,
     rpc, getCenterMembers, registerActivity,
-    getMemberSummary, getMemberRecent, getCenterRecent, undoLast
+    getMemberSummary, getMemberRecent, getCenterRecent, undoLast,
+    createMemberShare, revokeMemberShares, getPublicShare, publicRpc
   };
 })();

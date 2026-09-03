@@ -68,6 +68,28 @@
     $('memberSelect').onchange=e=>load(e.target.value);
     $('copyLinkBtn').onclick=()=>copy(buildUrl($('memberSelect').value));
     $('shareCopyBtn').onclick=()=>copy($('shareUrl').value);
+
+    $('createParentShareBtn').onclick=async()=>{
+      try{
+        const r=await SparkData.createMemberShare($('memberSelect').value);
+        const token=r?.token;
+        if(!token) throw new Error('TOKEN_NOT_RETURNED');
+        const u=new URL('parent-spark.html', location.href);
+        u.searchParams.set('share',token);
+        $('parentShareUrl').value=u.toString();
+        $('copyParentShareBtn').disabled=false;
+        toast('부모 공유링크를 만들었습니다.');
+      }catch(e){console.error(e);toast('공유링크 생성에 실패했습니다.');}
+    };
+    $('revokeParentShareBtn').onclick=async()=>{
+      if(!confirm('이 아이의 기존 부모 공유링크를 모두 해제할까요?'))return;
+      try{
+        await SparkData.revokeMemberShares($('memberSelect').value);
+        $('parentShareUrl').value='';$('copyParentShareBtn').disabled=true;
+        toast('기존 공유링크를 해제했습니다.');
+      }catch(e){console.error(e);toast('공유링크 해제에 실패했습니다.');}
+    };
+    $('copyParentShareBtn').onclick=()=>copy($('parentShareUrl').value);
     await load(memberId);
   }catch(e){console.error(e);msg('회원 목록을 불러오지 못했습니다.');}
 })();

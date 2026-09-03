@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>부모님 MY SPARK · v1.1.0</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.parent-wrap{max-width:860px;margin:auto}.parent-hero{text-align:center;padding:48px 18px 26px}
+.parent-flame{font-size:82px;filter:drop-shadow(0 0 22px rgba(255,126,0,.5))}
+.safe-note{padding:12px 14px;border-radius:14px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25)}
+@media(max-width:720px){.parent-flame{font-size:62px}.cards{grid-template-columns:1fr!important}}
+</style></head>
+<body>
+<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK</b></a><div class="version-pill">PARENT v1.1.0</div></header>
+<main class="container parent-wrap">
+<section class="parent-hero">
+  <div id="parentFlame" class="parent-flame">🔥</div>
+  <p class="eyebrow">MY SPARK · PARENT VIEW</p>
+  <h1 id="parentName">불러오는 중…</h1>
+  <p id="parentMessage" class="lead">좋은 행동이 하나씩 쌓이고 있습니다.</p>
+</section>
+<section class="safe-note">🔐 이 화면은 공유받은 아이의 성장정보만 보여주는 읽기 전용 화면입니다.</section>
+<section class="section"><div class="cards">
+  <article class="card"><h3>누적 SPARK XP</h3><p id="parentXp" class="big-number">-</p></article>
+  <article class="card"><h3>현재 LEVEL</h3><p id="parentLevel" class="big-number">-</p></article>
+  <article class="card"><h3>다음 성장</h3><p id="parentNext">-</p></article>
+</div></section>
+<section class="section"><h2>최근 좋은 행동</h2><div id="parentRecent" class="recent-list"><p class="empty">불러오는 중…</p></div></section>
+</main>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/spark-data.js"></script>
+<script src="assets/js/parent-spark.js"></script>
+</body></html>
