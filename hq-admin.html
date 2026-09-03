@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>GLOBAL SPARK HQ ADMIN · v1.6.0</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.hq-wrap{max-width:1180px;margin:auto}.login-box,.hq-panel{padding:20px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}
+.form-row{display:flex;gap:10px;flex-wrap:wrap}.form-row input,.form-row select,.review-note{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#0f172a;color:white}
+.form-row input{flex:1;min-width:220px}.requests{display:grid;gap:12px;margin-top:16px}
+.req{padding:16px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+.req-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.req-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.req-meta div{padding:10px;border-radius:10px;background:rgba(255,255,255,.035)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.status{font-size:.78rem;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.08)}
+@media(max-width:760px){.req-meta{grid-template-columns:1fr}.req-head{display:grid}}
+</style>
+</head>
+<body>
+<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK HQ</b></a><div class="version-pill">ADMIN v1.6.0</div></header>
+<main class="container hq-wrap">
+<section class="hero compact"><p class="eyebrow">GLOBAL HEADQUARTERS</p><h1>SPARK 본부 운영센터</h1><p class="lead">센터 참여 신청을 검토하고, 승인 시 공식 SPARK CENTER 번호를 자동 발급합니다.</p></section>
+
+<section id="loginBox" class="login-box">
+  <h2>본부 관리자 로그인</h2>
+  <div class="form-row"><input id="hqEmail" type="email" placeholder="이메일"><input id="hqPassword" type="password" placeholder="비밀번호"><button id="hqLoginBtn" class="primary" type="button">로그인</button></div>
+  <p id="hqLoginMsg" class="tiny"></p>
+</section>
+
+<section id="adminBox" class="hq-panel" hidden>
+  <div class="panel-head">
+    <div><p class="eyebrow">CENTER APPLICATIONS</p><h2>SPARK CENTER 참여 신청</h2></div>
+    <div class="form-row"><select id="statusFilter"><option value="all">전체</option><option value="new">신규</option><option value="reviewing">검토중</option><option value="approved">승인</option><option value="rejected">거절</option></select><button id="refreshRequestsBtn" class="secondary" type="button">새로고침</button></div>
+  </div>
+  <div id="requestList" class="requests"><p class="empty">불러오는 중…</p></div>
+</section>
+</main>
+<script src="assets/js/config.js"></script><script src="assets/js/spark-data.js"></script><script src="assets/js/hq-admin.js"></script>
+</body></html>
