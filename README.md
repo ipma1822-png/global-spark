@@ -1,38 +1,19 @@
-# CLASS → GLOBAL SPARK CONNECTOR v1.0
+# GLOBAL SPARK v0.9.0 — Minimal Update
 
-## 조사 결과
-- 최신 CLASS STAR는 `students(id, student_code, name, photo_url)`를 직접 읽음.
-- STAR 원기록은 `star_events(id, session_id, student_id, category_id, awarded_at)`.
-- 현재 STAR 저장은 `class/star/star.js`의 `award()`에서 성공 후 기존 Supabase/Realtime/효과로 이어짐.
-- 기존 CLASS DB에는 과거 IDP-SPARK용 `spark_member_links`가 있으므로 GLOBAL SPARK용으로 재사용하지 않음.
-- GLOBAL SPARK는 별도 Supabase이므로 DB를 합치지 않고 Connector로만 연결함.
+이번 버전은 **아이별 실제 MY SPARK 연결** 단계입니다.
 
-## v1.0 자동 연결 범위
-1. STAR ROOM 진입 시 재원생 이름/사진/학생ID를 GLOBAL SPARK KMT-000001에 동기화.
-2. CLASS의 기존 STAR 저장 성공 후 비동기로 GLOBAL SPARK 전송.
-3. GLOBAL SPARK 반영 카테고리(초기 안전 규칙):
-   - CARE 배려별 → 친구 배려
-   - CLEANUP 정리별 → 정리정돈
-   - CHALLENGE 도전별 → 운동·도전
-4. 다른 일반 STAR는 CLASS에만 남음. STAR 1개=무조건 SPARK XP 방식은 사용하지 않음.
-5. CLASS UNDO 후 GLOBAL SPARK도 append-only 반대 ledger로 취소.
-6. GLOBAL SPARK 실패가 CLASS STAR 지급을 막지 않음.
-7. `source_event_id`로 중복 전송 방지.
+## 추가
+- SPARK CENTER에서 선택한 아이의 MY SPARK 바로 열기
+- `my-spark.html?member=<UUID>` 아이별 실시간 조회
+- 센터 회원 선택 드롭다운
+- 누적 XP / LEVEL / 다음 LEVEL까지 남은 XP
+- LEVEL 진행률 바
+- 최근 좋은 행동 최대 20건
+- 실증용 성장 배지 표시
+- 아이별 링크 복사
 
-## 보안
-- 브라우저에 service_role/secret 없음.
-- KMT CLASS의 현재 Supabase JWT를 GLOBAL SPARK Edge Function으로 전달.
-- Edge Function이 KMT Supabase `/auth/v1/user`로 실제 세션을 검증하고 `class-admin@ipma.kr`만 허용.
-- GLOBAL SPARK service_role은 Edge Function 서버 환경에서만 사용.
+## 중요
+현재 개인 링크는 로그인된 실증 지도자용입니다.
+미성년자의 부모/아이에게 배포할 **무로그인 공개 링크**는 UUID를 그대로 공개하지 않고, 다음 단계에서 별도의 안전한 공유 토큰/RPC 구조로 구현합니다.
 
-## 적용 순서
-A. GLOBAL SPARK DB에서 `GLOBAL-SPARK/supabase/manual/PATCH-CLASS-CONNECTOR-v1.0.sql` 1회 실행.
-B. GLOBAL SPARK에 Edge Function `kmt-class-star` 배포. 이 함수는 외부 KMT JWT를 직접 검증하므로 Supabase 자체 JWT 검증은 OFF로 배포해야 함.
-C. KMT GitHub에 아래 3개만 반영:
-   - class/star/star.js
-   - class/star/star-config.js
-   - class/star/spark-connector.js
-D. STAR ROOM 새로고침 → 사진/이름 roster sync → 배려별/정리별/도전별 테스트.
-
-## 절대 건드리지 않은 것
-CLASS Auth/RLS/attendance/Realtime/STAR 테이블/STAR 점수/공동성장/VOICE 기존 동작은 재개발하지 않음.
+이번 v0.9.0은 DB 스키마 변경이 없으므로 Supabase SQL 실행이 필요 없습니다.
