@@ -1,15 +1,22 @@
-# GLOBAL SPARK HQ v0.3.0
-Official platform prototype for the GLOBAL SPARK MOVEMENT.
+# GLOBAL SPARK HQ v0.4.0
 
-## Included
-- `index.html` — GLOBAL SPARK HQ public MVP
-- `center.html` — one-hand SPARK CENTER activity input
-- `my-spark.html` — child/parent MY SPARK MVP
-- `docs/ARCHITECTURE-v0.3.0.md` — independent global architecture
-- `supabase/drafts/001_core_schema.sql` — **review-only schema draft**
+Official MVP foundation for the GLOBAL SPARK MOVEMENT.
+
+> 휴대폰이 없어도 누구나 좋은 행동과 도전을 인정받을 수 있는 글로벌 성장운동.
+
+## v0.4.0
+- Public HQ homepage
+- SPARK CENTER one-hand input prototype
+- MY SPARK prototype
+- First pilot center page: 계명태권도 / Ulsan / Korea / No.000001
+- Independent Supabase connection template (no secrets)
+- Draft core schema + first-center seed
+- Supabase safety/connection checklist
 
 ## Safety
-This version does **not** connect to or modify Supabase. The SQL is deliberately under `supabase/drafts/`, not `supabase/migrations/`, because production deployment is not approved yet. Existing CLASS, IDP, ACTS and Global News24 systems are untouched.
+`supabase/drafts/` contains review-only SQL. It is intentionally not an auto-deploy migration.
+Existing CLASS, ACTS, Global News24 and IDP systems are not modified.
 
-## Test
-Open `center.html`, register activities for 김민규, then open `my-spark.html`. Both pages use the same browser localStorage test ledger for v0.3.0.
+## Next
+After the independent GLOBAL SPARK Supabase project credentials/schema are verified:
+activity → rule-based XP → append-only ledger → MY SPARK → center stats.

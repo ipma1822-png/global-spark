@@ -1,5 +1,5 @@
 (function(){
-  const VERSION='v0.3.0';
+  const VERSION='v0.4.0';
   const STORE='globalSpark.activities.v030';
   const students=[
     {id:'KM001',name:'김민규',group:'계명태권도'},

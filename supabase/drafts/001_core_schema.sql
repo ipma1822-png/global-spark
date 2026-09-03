@@ -1,4 +1,4 @@
--- GLOBAL SPARK core schema DRAFT v0.3.0
+-- GLOBAL SPARK core schema DRAFT v0.4.0
 -- REVIEW ONLY: do not run in production yet.
 -- Intentionally stored under supabase/drafts, not migrations.
 
