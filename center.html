@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>SPARK CENTER 입력기 · v0.3.0</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="center-body">
+<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK</b></a><div class="version-pill">CENTER v0.3.0</div></header>
+<main class="center-app">
+  <section class="center-title">
+    <p class="eyebrow">SPARK CENTER · ONE-HAND INPUT</p>
+    <h1>좋은 행동 등록</h1>
+    <p>아이 선택 → 행동 선택 → 확인. 지도자는 XP 숫자를 입력하지 않습니다.</p>
+  </section>
+
+  <section class="center-status">
+    <div><span>센터</span><b>계명태권도 · 제1호 실증센터</b></div>
+    <div><span>오늘 등록</span><b id="todayCount">0건</b></div>
+  </section>
+
+  <section class="input-panel">
+    <h2>1. 아이 선택</h2>
+    <div class="search-row"><input id="studentSearch" type="search" placeholder="이름 검색" autocomplete="off"><button id="clearSearch" type="button">지우기</button></div>
+    <div id="studentGrid" class="student-grid"></div>
+  </section>
+
+  <section class="input-panel">
+    <h2>2. 좋은 행동 선택</h2>
+    <div id="behaviorGrid" class="behavior-grid"></div>
+  </section>
+
+  <section class="voice-panel">
+    <button id="voiceBtn" class="voice-btn" type="button">🎙 음성으로 등록</button>
+    <p id="voiceHint">예: “김민규 부모님 돕기 하나”</p>
+  </section>
+
+  <section class="selection-box" aria-live="polite">
+    <div><span>선택한 아이</span><b id="selectedStudent">선택 안 됨</b></div>
+    <div><span>선택한 행동</span><b id="selectedBehavior">선택 안 됨</b></div>
+    <button id="registerBtn" class="primary wide" type="button" disabled>🔥 SPARK 활동 등록</button>
+  </section>
+
+  <section class="recent-panel">
+    <div class="recent-head"><div><p class="eyebrow">RECENT</p><h2>최근 등록</h2></div><button id="undoBtn" type="button" class="secondary" disabled>↶ 마지막 등록 취소</button></div>
+    <div id="recentList" class="recent-list"><p class="empty">아직 등록된 활동이 없습니다.</p></div>
+  </section>
+</main>
+
+<div id="confirmModal" class="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-flame">🔥</div><h2 id="confirmTitle">SPARK 활동 확인</h2><p id="confirmText"></p><p class="xp-preview">공식 규칙: <b>+5 XP</b></p>
+    <div class="modal-actions"><button id="cancelConfirm" class="secondary" type="button">취소</button><button id="confirmSave" class="primary" type="button">확인 · 저장</button></div>
+  </div>
+</div>
+<div id="toast" class="toast" hidden></div>
+<script src="assets/js/center.js"></script>
+</body></html>
