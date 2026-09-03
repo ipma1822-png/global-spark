@@ -1,3 +1,4 @@
+// GLOBAL SPARK PHASE 2-3.1 · v2.3.1
 (function(){
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const center=new URLSearchParams(location.search).get('center'); let members=[],rules=[],member=null,rule=null;
@@ -7,15 +8,15 @@ $('centerTitle').textContent=center+' · SPARK 입력';
 function drawMembers(){$('memberGrid').innerHTML=members.filter(x=>x.active).map(x=>`<button class="member ${member===x.id?'active':''}" data-id="${x.id}"><b>${esc(x.display_name)}</b><small>${esc(x.member_code||'')}</small></button>`).join('')||'등록된 아이가 없습니다.'}
 function drawRules(){$('ruleGrid').innerHTML=rules.map(x=>`<button class="rule ${rule===x.activity_type?'active':''}" data-type="${esc(x.activity_type)}"><b>${esc(x.label_ko)}</b><small>+${x.xp} XP</small></button>`).join('')}
 async function recent(){try{const a=await SparkData.centerGetRecent(center,30);$('recentList').innerHTML=a.length?a.map(x=>`<div class="recent-item"><div><b>${esc(x.display_name)} · ${esc(x.label_ko)}</b><small>${new Date(x.created_at).toLocaleString('ko-KR')}</small></div><b>+${x.net_xp} XP</b></div>`).join(''):'최근 기록이 없습니다.'}catch(e){$('recentList').textContent='최근 기록을 불러오지 못했습니다.'}}
+function missionCard(m, canConfirm){return `<article class="mission-card ${m.completed?'done':''}" data-id="${m.id}"><div class="mission-meta">${esc(m.flame_code)} · ${esc(m.target_label||'모두')} · ${esc(pLabels[m.participation_type]||m.participation_type)} · ${esc(m.difficulty)}</div><h3>${m.completed?'✅ ':''}${esc(m.title)}</h3><p>${esc(m.description)}</p>${m.safety_guide?`<p class="tiny">🛡 ${esc(m.safety_guide)}</p>`:''}${m.completed?'<span class="tiny">센터 확인 완료</span>':canConfirm?'<button class="secondary mission-done" type="button">✅ 현실 행동 완료 확인</button>':'<span class="tiny">회원 선택 후 완료 확인 가능</span>'}</article>`}
 async function missions(){
- if(!member){$('missionList').innerHTML='<p class="empty">먼저 회원을 선택해 주세요.</p>';return;}
  $('missionList').innerHTML='<p class="empty">MISSION 불러오는 중…</p>';
  try{
-  const rows=await SparkData.memberMissions(member);
-  $('missionList').innerHTML=rows.length?rows.map(m=>`<article class="mission-card ${m.completed?'done':''}" data-id="${m.id}"><div class="mission-meta">${esc(m.flame_code)} · ${esc(m.target_label||'모두')} · ${esc(pLabels[m.participation_type]||m.participation_type)} · ${esc(m.difficulty)}</div><h3>${m.completed?'✅ ':''}${esc(m.title)}</h3><p>${esc(m.description)}</p>${m.safety_guide?`<p class="tiny">🛡 ${esc(m.safety_guide)}</p>`:''}${m.completed?'<span class="tiny">센터 확인 완료</span>':'<button class="secondary mission-done" type="button">✅ 현실 행동 완료 확인</button>'}</article>`).join(''):'<p class="empty">현재 공개된 MISSION이 없습니다.</p>';
+  const rows=member?await SparkData.memberMissions(member):await SparkData.publicMissions(20);
+  $('missionList').innerHTML=rows.length?rows.map(m=>missionCard(m,!!member)).join(''):'<p class="empty">현재 공개된 MISSION이 없습니다.</p>';
  }catch(e){console.error(e);$('missionList').innerHTML='<p class="empty">MISSION을 불러오지 못했습니다.</p>';}
 }
-async function load(){try{[members,rules]=await Promise.all([SparkData.centerGetMembers(center),SparkData.centerGetRules()]);drawMembers();drawRules();recent()}catch(e){console.error(e);$('status').textContent=e?.status===401?'로그인 세션을 다시 확인해 주세요.':'센터 지도자 로그인과 권한을 확인해 주세요.';$('memberGrid').textContent='회원 목록을 불러오지 못했습니다.';}}
+async function load(){try{[members,rules]=await Promise.all([SparkData.centerGetMembers(center),SparkData.centerGetRules()]);const first=members.find(x=>x.active);if(first)member=first.id;drawMembers();drawRules();recent();missions()}catch(e){console.error(e);$('status').textContent=e?.status===401?'로그인 세션을 다시 확인해 주세요.':'센터 지도자 로그인과 권한을 확인해 주세요.';$('memberGrid').textContent='회원 목록을 불러오지 못했습니다.';missions()}}
 $('memberGrid').onclick=e=>{const b=e.target.closest('.member');if(b){member=b.dataset.id;drawMembers();missions()}};
 $('ruleGrid').onclick=e=>{const b=e.target.closest('.rule');if(b){rule=b.dataset.type;drawRules()}};
 $('missionList').onclick=async e=>{const b=e.target.closest('.mission-done');if(!b||!member)return;const card=b.closest('.mission-card');if(!confirm(`${selectedName()}의 MISSION 완료를 확인할까요?\n이번 단계에서는 XP가 추가되지 않습니다.`))return;b.disabled=true;try{await SparkData.confirmMission(member,card.dataset.id);$('status').textContent=`✅ ${selectedName()} MISSION 완료 확인`;await missions()}catch(err){console.error(err);$('status').textContent='MISSION 완료 확인에 실패했습니다.'}finally{b.disabled=false}};
