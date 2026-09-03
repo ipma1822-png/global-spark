@@ -1,7 +1,7 @@
 <!doctype html><html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111827">
-<title>MY SPARK · PHASE 2-1 · v2.1.0</title><link rel="stylesheet" href="assets/css/style.css">
+<title>MY SPARK · PHASE 2-2 · v2.2.0</title><link rel="stylesheet" href="assets/css/style.css">
 <style>
 .my-head{display:grid;gap:16px}.my-select{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .my-select select{min-width:220px;padding:11px 12px;border-radius:12px}
@@ -9,11 +9,13 @@
 .progress-bar{height:100%;width:0;background:linear-gradient(90deg,#ff9f1c,#ff5a36);transition:width .5s ease}
 .share-box{display:flex;gap:8px;flex-wrap:wrap}.share-box input{flex:1;min-width:220px;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#0f172a;color:#fff}
 .badge-row{display:flex;gap:10px;flex-wrap:wrap}
-.spark-identity{display:flex;align-items:center;gap:22px}
-.spark-flame{font-size:76px;filter:drop-shadow(0 0 22px rgba(255,126,0,.45));animation:sparkPulse 1.8s ease-in-out infinite}
+.spark-identity{display:flex;align-items:center;gap:28px}
+.spark-flame{width:min(34vw,180px);height:min(34vw,180px);object-fit:contain;filter:drop-shadow(0 0 24px rgba(255,126,0,.5));animation:sparkPulse 1.8s ease-in-out infinite}
+.flame-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.flame-card{position:relative;padding:18px 12px;text-align:center;overflow:hidden}.flame-card img{width:64px;height:64px;object-fit:contain;filter:grayscale(.75);opacity:.48;transition:.35s}.flame-card.active img{filter:none;opacity:1;transform:scale(1.06)}.flame-card.active{border-color:rgba(255,177,27,.48);box-shadow:0 0 28px rgba(255,122,24,.12)}.flame-card strong,.flame-card small{display:block}.flame-card small{color:var(--muted)}.flame-count{font-weight:900;color:#ffd089;margin-top:7px}.next-action{padding:20px;border-radius:18px;background:linear-gradient(135deg,rgba(255,177,27,.14),rgba(255,90,54,.08));border:1px solid rgba(255,177,27,.32)}
 @keyframes sparkPulse{50%{transform:scale(1.09)}}
 @media(max-width:720px){
- .spark-identity{align-items:flex-start}.spark-flame{font-size:58px}
+ .spark-identity{align-items:center}.spark-flame{width:105px;height:105px;flex:0 0 105px}
+ .flame-grid{grid-template-columns:repeat(2,1fr)}.flame-card:last-child{grid-column:1/-1}
  .cards{grid-template-columns:1fr!important}
  .hero.compact{padding-top:32px!important}
  .my-select{align-items:stretch}.my-select select,.my-select button{width:100%;min-width:0}
@@ -21,18 +23,24 @@
 }.badge-chip{padding:10px 12px;border-radius:999px;background:rgba(255,159,28,.12);border:1px solid rgba(255,159,28,.35)}
 </style></head>
 <body>
-<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK</b></a><div class="version-pill">PHASE 2-1 · v2.1.0</div></header>
+<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK</b></a><div class="version-pill">PHASE 2-2 · v2.2.0</div></header>
 <main class="container">
 <section class="hero compact my-head">
   <div><p class="eyebrow">MY SPARK · PILOT LIVE VIEW</p><h1 id="memberName">불러오는 중…</h1>
-  <p class="lead">좋은 행동이 쌓일수록 나의 SPARK가 성장합니다.</p></div>
+  <p class="lead">현실에서 행동하면 나의 SPARK가 성장하고, 그 과정에서 실제 나도 성장합니다.</p></div>
   <div class="my-select"><label for="memberSelect">회원 선택</label><select id="memberSelect"></select><button id="copyLinkBtn" class="secondary" type="button">🔗 회원 링크 복사</button></div>
 </section>
 
 <section class="section spark-identity">
-<div class="spark-flame" id="sparkFlame" aria-label="나의 SPARK 불꽃">🔥</div>
+<img class="spark-flame" id="sparkFlame" src="assets/spark/levels/ember.svg" alt="나의 SPARK 성장 이미지">
 <div><p class="eyebrow">MY GROWTH FLAME</p><h2 id="growthTitle">나의 불꽃이 자라고 있어요</h2>
 <p id="growthMessage">좋은 행동 하나가 세상을 조금 더 밝게 만듭니다.</p></div>
+</section>
+
+<section class="section">
+  <p class="eyebrow">FIVE FLAMES</p><h2>나의 5대 불꽃</h2>
+  <div id="flameGrid" class="flame-grid" aria-live="polite"></div>
+  <p class="tiny">활동에는 하나의 대표 불꽃이 연결됩니다. EARTH 활동은 향후 환경 활동규칙과 함께 시작됩니다.</p>
 </section>
 <section class="section"><div class="cards">
 <article class="card"><h3>누적 SPARK XP</h3><p id="xp" class="big-number">0 XP</p></article>
@@ -53,6 +61,7 @@
 </section>
 
 <section class="section"><h2>최근 SPARK 활동</h2><div id="myRecent" class="recent-list"><p class="empty">불러오는 중…</p></div></section>
+<section class="section"><div class="next-action"><p class="eyebrow">NEXT REAL ACTION</p><h2>화면 밖에서 다음 불꽃을 깨워보세요</h2><p id="nextActionMessage">오늘 할 수 있는 작은 실천 하나를 찾아보세요.</p></div></section>
 <section class="section"><h2>센터회원 확인 링크</h2><div class="share-box"><input id="shareUrl" readonly><button id="shareCopyBtn" class="secondary" type="button">복사</button></div><p class="tiny">이 링크는 로그인된 센터 지도자용입니다. 보호자에게는 아래의 안전한 공유링크를 사용합니다.</p></section>
 
 <section class="section">
@@ -73,5 +82,5 @@
 <p><a class="btn secondary" href="my-centers.html">← 나의 SPARK CENTER</a></p>
 </main>
 <div id="toast" class="toast" hidden></div>
-<script src="assets/js/config.js"></script><script src="assets/js/spark-data.js"></script><script src="assets/js/my-spark.js"></script>
+<script src="assets/js/config.js"></script><script src="assets/js/spark-data.js"></script><script src="assets/js/spark-growth-config.js"></script><script src="assets/js/my-spark.js"></script>
 </body></html>
