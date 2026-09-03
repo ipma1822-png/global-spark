@@ -1,5 +1,5 @@
 (function(){
-  const VERSION='v0.9.0';
+  const VERSION='v1.0.0';
   const behaviorDefs=[
     ['🏠','부모님 돕기','help_parents'],
     ['🤝','친구 배려','care_friend'],
@@ -70,7 +70,7 @@
         logout(); showToast('로그인 세션이 만료되었습니다. 다시 로그인해 주세요.');
       } else {
         setConnection('DB 연결 오류');
-        showToast('센터 회원을 불러오지 못했습니다. v0.9.0 SQL 패치를 확인해 주세요.',4500);
+        showToast('센터 회원을 불러오지 못했습니다. v1.0.0 SQL 패치를 확인해 주세요.',4500);
       }
     }
   }

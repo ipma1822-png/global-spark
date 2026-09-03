@@ -45,6 +45,11 @@
       $('progressBar').style.width=pct+'%';
       $('progressText').textContent=`현재 LEVEL 진행률 ${Math.round(pct)}% · ${remain} XP 남음`;
       setBadges(total);
+      const flame=$('sparkFlame'), title=$('growthTitle'), gm=$('growthMessage');
+      if(total>=100){flame.textContent='🔥🔥🔥';title.textContent='강한 SPARK 불꽃!';gm.textContent='꾸준한 좋은 행동이 큰 불꽃으로 성장했습니다.';}
+      else if(total>=50){flame.textContent='🔥🔥';title.textContent='불꽃이 힘차게 자라고 있어요';gm.textContent='좋은 실천이 계속 쌓이고 있습니다.';}
+      else if(total>=25){flame.textContent='🔥';title.textContent='SPARK 불꽃이 자라고 있어요';gm.textContent='꾸준한 실천이 멋진 성장으로 이어지고 있어요.';}
+      else {flame.textContent='✨🔥';title.textContent='첫 불꽃이 시작됐어요';gm.textContent='좋은 행동 하나가 세상을 조금 더 밝게 만듭니다.';}
       $('myRecent').innerHTML=recent.length?recent.map(r=>`<div class="recent-item"><div><b>🔥 ${r.label_ko}</b><small>${new Date(r.created_at).toLocaleString('ko-KR')}</small></div><div class="xp">${Number(r.net_xp)>0?'+':''}${r.net_xp} XP</div></div>`).join(''):'<p class="empty">아직 등록된 SPARK 활동이 없습니다.</p>';
     }catch(e){console.error(e);msg('MY SPARK 데이터를 불러오지 못했습니다.');}
   }
