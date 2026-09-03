@@ -1,9 +1,10 @@
-// GLOBAL SPARK HQ v1.9.0
-// Authenticated Supabase MVP adapter for the independent GLOBAL SPARK project.
+// GLOBAL SPARK PHASE 2-3 · v2.3.0
+// Lightweight authenticated Supabase adapter. Access tokens are refreshed once on 401.
 (function () {
   const SESSION_KEY = "globalSparkSession.v080";
   const cfg = window.SPARK_CONFIG || {};
   const configured = !!(cfg.supabaseUrl && cfg.supabaseAnonKey);
+  let refreshPromise = null;
 
   function readSession() {
     try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); }
@@ -13,161 +14,131 @@
     if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s));
     else localStorage.removeItem(SESSION_KEY);
   }
-  function token() {
-    const s = readSession();
-    return s?.access_token || "";
-  }
-  function isSignedIn() { return !!token(); }
+  function token() { return readSession()?.access_token || ""; }
+  function isSignedIn() { return !!readSession()?.refresh_token || !!token(); }
 
-  async function api(path, options={}) {
+  async function refreshSession() {
+    if (refreshPromise) return refreshPromise;
+    refreshPromise = (async () => {
+      const s = readSession();
+      if (!configured || !s?.refresh_token) throw new Error("AUTH_REFRESH_REQUIRED");
+      const base = cfg.supabaseUrl.replace(/\/$/, "");
+      const res = await fetch(base + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        headers: { "apikey": cfg.supabaseAnonKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: s.refresh_token })
+      });
+      const text = await res.text();
+      let body = null;
+      try { body = text ? JSON.parse(text) : null; } catch (_) { body = text; }
+      if (!res.ok || !body?.access_token) {
+        saveSession(null);
+        const err = new Error("AUTH_REFRESH_FAILED"); err.status = res.status; err.body = body; throw err;
+      }
+      saveSession({ ...s, ...body, refresh_token: body.refresh_token || s.refresh_token });
+      return readSession();
+    })().finally(() => { refreshPromise = null; });
+    return refreshPromise;
+  }
+
+  async function api(path, options = {}, canRetry = true) {
     if (!configured) throw new Error("SPARK_CONFIG_NOT_READY");
-    const base = cfg.supabaseUrl.replace(/\/$/,"");
+    const base = cfg.supabaseUrl.replace(/\/$/, "");
     const headers = {
       "apikey": cfg.supabaseAnonKey,
       "Content-Type": "application/json",
       ...(options.headers || {})
     };
     if (token()) headers.Authorization = "Bearer " + token();
-
-    const res = await fetch(base + path, {...options, headers});
+    const res = await fetch(base + path, { ...options, headers });
+    if (res.status === 401 && canRetry && readSession()?.refresh_token) {
+      await refreshSession();
+      return api(path, options, false);
+    }
     const text = await res.text();
     let body = null;
     try { body = text ? JSON.parse(text) : null; } catch (_) { body = text; }
     if (!res.ok) {
       const err = new Error(typeof body === "string" ? body : JSON.stringify(body));
-      err.status = res.status;
-      err.body = body;
-      throw err;
+      err.status = res.status; err.body = body; throw err;
     }
     return body;
   }
 
   async function signIn(email, password) {
     const body = await api("/auth/v1/token?grant_type=password", {
-      method: "POST",
-      body: JSON.stringify({email, password})
-    });
-    saveSession(body);
-    return body;
+      method: "POST", body: JSON.stringify({ email, password })
+    }, false);
+    saveSession(body); return body;
   }
   function signOut() { saveSession(null); }
 
-  async function rpc(name, payload={}) {
+  async function rpc(name, payload = {}) {
     if (!isSignedIn()) throw new Error("AUTH_REQUIRED");
     return api("/rest/v1/rpc/" + name, {
-      method: "POST",
-      headers: {"Prefer":"return=representation"},
-      body: JSON.stringify(payload)
+      method: "POST", headers: { "Prefer": "return=representation" }, body: JSON.stringify(payload)
     });
   }
-
-  async function publicRpc(name, payload={}) {
-    const saved = readSession();
-    const base = cfg.supabaseUrl.replace(/\/$/,"");
+  async function publicRpc(name, payload = {}) {
+    if (!configured) throw new Error("SPARK_CONFIG_NOT_READY");
+    const base = cfg.supabaseUrl.replace(/\/$/, "");
     const res = await fetch(base + "/rest/v1/rpc/" + name, {
-      method:"POST",
-      headers:{
-        "apikey":cfg.supabaseAnonKey,
-        "Authorization":"Bearer " + cfg.supabaseAnonKey,
-        "Content-Type":"application/json",
-        "Prefer":"return=representation"
-      },
-      body:JSON.stringify(payload)
+      method: "POST",
+      headers: { "apikey": cfg.supabaseAnonKey, "Authorization": "Bearer " + cfg.supabaseAnonKey, "Content-Type": "application/json", "Prefer": "return=representation" },
+      body: JSON.stringify(payload)
     });
-    const text=await res.text();
-    let body=null; try{body=text?JSON.parse(text):null;}catch(_){body=text;}
-    if(!res.ok) throw new Error(typeof body==="string"?body:JSON.stringify(body));
+    const text = await res.text(); let body = null;
+    try { body = text ? JSON.parse(text) : null; } catch (_) { body = text; }
+    if (!res.ok) throw new Error(typeof body === "string" ? body : JSON.stringify(body));
     return body;
   }
 
-  async function getCenterMembers(centerCode=cfg.centerCode) {
-    return rpc("spark_get_center_members", {p_center_code:centerCode});
-  }
-  async function registerActivity({member_id, activity_type, memo=null, source_event_id=null}) {
-    return rpc("spark_register_activity", {
-      p_member_id: member_id,
-      p_center_code: cfg.centerCode,
-      p_activity_type: activity_type,
-      p_memo: memo,
-      p_source_event_id: source_event_id
-    });
-  }
-  async function getMemberSummary(memberId) {
-    return rpc("spark_get_member_summary", {p_member_id:memberId});
-  }
-  async function getMemberRecent(memberId, limit=10) {
-    return rpc("spark_get_member_recent", {p_member_id:memberId, p_limit:limit});
-  }
-  async function getCenterRecent(limit=12) {
-    return rpc("spark_get_center_recent", {p_center_code:cfg.centerCode, p_limit:limit});
-  }
-  async function undoLast() {
-    return rpc("spark_undo_last_activity", {p_center_code:cfg.centerCode});
-  }
-  async function createMemberShare(memberId) {
-    return rpc("spark_create_member_share", {p_member_id:memberId});
-  }
-  async function revokeMemberShares(memberId) {
-    return rpc("spark_revoke_member_shares", {p_member_id:memberId});
-  }
-  async function getPublicShare(token) {
-    return publicRpc("spark_get_public_share", {p_token:token});
-  }
-  async function getCenterGrowth() {
-    return rpc("spark_get_center_growth", {p_center_code:cfg.centerCode});
-  }
-  async function getPublicLive() {
-    return publicRpc("spark_get_public_live", {});
-  }
-  async function findPublicCenters(query="") {
-    return publicRpc("spark_find_public_centers", {p_query:query});
-  }
-  async function submitCenterInterest(payload) {
-    return publicRpc("spark_submit_center_interest", payload);
-  }
-  async function hqGetCenterInterests(status="all") {
-    return rpc("spark_hq_get_center_interests", {p_status:status});
-  }
-  async function hqReviewCenterInterest(id, action, note="") {
-    return rpc("spark_hq_review_center_interest", {p_interest_id:id,p_action:action,p_note:note});
-  }
-  async function hqApproveAndCreateCenter(id, note="") {
-    return rpc("spark_hq_approve_and_create_center", {p_interest_id:id,p_note:note});
-  }
-  async function hqAssignCenterLeader(centerCode, email) {
-    return rpc("spark_hq_assign_center_leader", {p_center_code:centerCode,p_email:email});
-  }
-  async function getMyCenters() {
-    return rpc("spark_get_my_centers", {});
-  }
-  async function centerGetMembers(centerCode) {
-    return rpc("spark_center_admin_get_members", {p_center_code:centerCode});
-  }
-  async function centerCreateMember(centerCode, displayName) {
-    return rpc("spark_center_admin_create_member", {p_center_code:centerCode,p_display_name:displayName});
-  }
-  async function centerUpdateMember(memberId, displayName, active) {
-    return rpc("spark_center_admin_update_member", {p_member_id:memberId,p_display_name:displayName,p_active:active});
-  }
-  async function centerGetRules() {
-    return rpc("spark_center_get_rules", {});
-  }
-  async function centerRegisterActivity(centerCode, memberId, activityType, memo="") {
-    return rpc("spark_center_register_activity_v190", {p_center_code:centerCode,p_member_id:memberId,p_activity_type:activityType,p_memo:memo});
-  }
-  async function centerGetRecent(centerCode, limit=20) {
-    return rpc("spark_center_recent_v190", {p_center_code:centerCode,p_limit:limit});
-  }
-  async function centerUndoLast(centerCode, memberId=null) {
-    return rpc("spark_center_undo_last_v190", {p_center_code:centerCode,p_member_id:memberId});
-  }
+  const getCenterMembers = (centerCode = cfg.centerCode) => rpc("spark_get_center_members", { p_center_code: centerCode });
+  const registerActivity = ({ member_id, activity_type, memo = null, source_event_id = null }) => rpc("spark_register_activity", { p_member_id: member_id, p_center_code: cfg.centerCode, p_activity_type: activity_type, p_memo: memo, p_source_event_id: source_event_id });
+  const getMemberSummary = memberId => rpc("spark_get_member_summary", { p_member_id: memberId });
+  const getMemberRecent = (memberId, limit = 10) => rpc("spark_get_member_recent", { p_member_id: memberId, p_limit: limit });
+  const getCenterRecent = (limit = 12) => rpc("spark_get_center_recent", { p_center_code: cfg.centerCode, p_limit: limit });
+  const undoLast = () => rpc("spark_undo_last_activity", { p_center_code: cfg.centerCode });
+  const createMemberShare = memberId => rpc("spark_create_member_share", { p_member_id: memberId });
+  const revokeMemberShares = memberId => rpc("spark_revoke_member_shares", { p_member_id: memberId });
+  const getPublicShare = t => publicRpc("spark_get_public_share", { p_token: t });
+  const getCenterGrowth = () => rpc("spark_get_center_growth", { p_center_code: cfg.centerCode });
+  const getPublicLive = () => publicRpc("spark_get_public_live", {});
+  const findPublicCenters = (query = "") => publicRpc("spark_find_public_centers", { p_query: query });
+  const submitCenterInterest = payload => publicRpc("spark_submit_center_interest", payload);
+  const hqGetCenterInterests = (status = "all") => rpc("spark_hq_get_center_interests", { p_status: status });
+  const hqReviewCenterInterest = (id, action, note = "") => rpc("spark_hq_review_center_interest", { p_interest_id: id, p_action: action, p_note: note });
+  const hqApproveAndCreateCenter = (id, note = "") => rpc("spark_hq_approve_and_create_center", { p_interest_id: id, p_note: note });
+  const hqAssignCenterLeader = (centerCode, email) => rpc("spark_hq_assign_center_leader", { p_center_code: centerCode, p_email: email });
+  const getMyCenters = () => rpc("spark_get_my_centers", {});
+  const centerGetMembers = centerCode => rpc("spark_center_admin_get_members", { p_center_code: centerCode });
+  const centerCreateMember = (centerCode, displayName) => rpc("spark_center_admin_create_member", { p_center_code: centerCode, p_display_name: displayName });
+  const centerUpdateMember = (memberId, displayName, active) => rpc("spark_center_admin_update_member", { p_member_id: memberId, p_display_name: displayName, p_active: active });
+  const centerGetRules = () => rpc("spark_center_get_rules", {});
+  const centerRegisterActivity = (centerCode, memberId, activityType, memo = "") => rpc("spark_center_register_activity_v190", { p_center_code: centerCode, p_member_id: memberId, p_activity_type: activityType, p_memo: memo });
+  const centerGetRecent = (centerCode, limit = 20) => rpc("spark_center_recent_v190", { p_center_code: centerCode, p_limit: limit });
+  const centerUndoLast = (centerCode, memberId = null) => rpc("spark_center_undo_last_v190", { p_center_code: centerCode, p_member_id: memberId });
+
+  // PHASE 2-3 MISSION v1.0. Mission completion is recognition-only; it awards 0 XP in this phase.
+  const publicMissions = (limit = 12) => publicRpc("spark_public_missions", { p_limit: limit });
+  const memberMissions = memberId => rpc("spark_member_missions", { p_member_id: memberId });
+  const confirmMission = (memberId, missionId) => rpc("spark_confirm_mission", { p_member_id: memberId, p_mission_id: missionId });
+  const hqMissions = () => rpc("spark_hq_missions", {});
+  const hqSaveMission = m => rpc("spark_hq_save_mission", {
+    p_id: m.id || null, p_title: m.title, p_description: m.description, p_flame_code: m.flame_code,
+    p_target_label: m.target_label || "모두", p_difficulty: m.difficulty || "easy",
+    p_participation_type: m.participation_type || "solo", p_safety_guide: m.safety_guide || "",
+    p_starts_at: m.starts_at || null, p_ends_at: m.ends_at || null
+  });
+  const hqSetMissionStatus = (id, status) => rpc("spark_hq_set_mission_status", { p_id: id, p_status: status });
 
   window.SparkData = {
-    configured,
-    mode: configured ? "supabase-live-v080" : "not-configured",
-    readSession, isSignedIn, signIn, signOut,
-    rpc, getCenterMembers, registerActivity,
-    getMemberSummary, getMemberRecent, getCenterRecent, undoLast,
-    createMemberShare, revokeMemberShares, getPublicShare, getCenterGrowth, getPublicLive, findPublicCenters, submitCenterInterest, hqGetCenterInterests, hqReviewCenterInterest, hqApproveAndCreateCenter, hqAssignCenterLeader, getMyCenters, centerGetMembers, centerCreateMember, centerUpdateMember, centerGetRules, centerRegisterActivity, centerGetRecent, centerUndoLast, publicRpc
+    configured, mode: configured ? "supabase-live-v230" : "not-configured",
+    readSession, isSignedIn, signIn, signOut, refreshSession, rpc, publicRpc,
+    getCenterMembers, registerActivity, getMemberSummary, getMemberRecent, getCenterRecent, undoLast,
+    createMemberShare, revokeMemberShares, getPublicShare, getCenterGrowth, getPublicLive, findPublicCenters,
+    submitCenterInterest, hqGetCenterInterests, hqReviewCenterInterest, hqApproveAndCreateCenter, hqAssignCenterLeader,
+    getMyCenters, centerGetMembers, centerCreateMember, centerUpdateMember, centerGetRules, centerRegisterActivity,
+    centerGetRecent, centerUndoLast, publicMissions, memberMissions, confirmMission, hqMissions, hqSaveMission, hqSetMissionStatus
   };
 })();
