@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1020">
-<title>GLOBAL SPARK HQ ADMIN · v1.6.0</title>
+<title>GLOBAL SPARK HQ ADMIN · v1.7.0</title>
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
 .hq-wrap{max-width:1180px;margin:auto}.login-box,.hq-panel{padding:20px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}
@@ -16,7 +16,7 @@
 </style>
 </head>
 <body>
-<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK HQ</b></a><div class="version-pill">ADMIN v1.6.0</div></header>
+<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK HQ</b></a><div class="version-pill">ADMIN v1.7.0</div></header>
 <main class="container hq-wrap">
 <section class="hero compact"><p class="eyebrow">GLOBAL HEADQUARTERS</p><h1>SPARK 본부 운영센터</h1><p class="lead">센터 참여 신청을 검토하고, 승인 시 공식 SPARK CENTER 번호를 자동 발급합니다.</p></section>
 
@@ -33,6 +33,18 @@
   </div>
   <div id="requestList" class="requests"><p class="empty">불러오는 중…</p></div>
 </section>
+
+<section id="leaderAssignBox" class="hq-panel" style="margin-top:18px">
+  <p class="eyebrow">CENTER LEADER</p><h2>승인 센터 지도자 연결</h2>
+  <p>승인된 공식 센터번호와 Supabase Auth에 등록된 지도자 이메일을 연결합니다.</p>
+  <div class="form-row">
+    <input id="leaderCenterCode" placeholder="예: SPK-000002">
+    <input id="leaderEmail" type="email" placeholder="지도자 로그인 이메일">
+    <button id="assignLeaderBtn" class="primary" type="button">지도자 연결</button>
+  </div>
+  <p id="leaderAssignMsg" class="tiny"></p>
+</section>
+
 </main>
 <script src="assets/js/config.js"></script><script src="assets/js/spark-data.js"></script><script src="assets/js/hq-admin.js"></script>
 </body></html>

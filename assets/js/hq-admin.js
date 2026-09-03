@@ -50,4 +50,13 @@
    finally{btn.disabled=false;}
  });
  if(SparkData.isSignedIn()){ $('loginBox').hidden=true;$('adminBox').hidden=false;load(); }
+
+ $('assignLeaderBtn').onclick=async()=>{
+   const code=$('leaderCenterCode').value.trim(), email=$('leaderEmail').value.trim();
+   if(!code||!email){$('leaderAssignMsg').textContent='센터번호와 지도자 이메일을 입력해 주세요.';return;}
+   try{
+     const r=await SparkData.hqAssignCenterLeader(code,email);
+     $('leaderAssignMsg').textContent=`🔥 연결 완료 · ${r.center_code} · ${r.email}`;
+   }catch(err){console.error(err);$('leaderAssignMsg').textContent='연결 실패: Auth에 해당 이메일 사용자가 있는지 확인해 주세요.';}
+ };
 })();
