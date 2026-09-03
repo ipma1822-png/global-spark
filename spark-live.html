@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>SPARK LIVE · v1.3.0</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+.live-wrap{max-width:1180px;margin:auto}.live-hero{text-align:center;padding:64px 18px 34px}
+.live-hero h1{font-size:clamp(2.8rem,8vw,6.5rem);margin:.2em 0}
+.live-sub{font-size:clamp(1rem,2.2vw,1.35rem);opacity:.85}
+.live-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0}
+.live-stat{padding:22px;border-radius:20px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);text-align:center}
+.live-stat b{display:block;font-size:clamp(2rem,4vw,3.4rem);margin-bottom:6px}
+.live-stat span{opacity:.75}.live-flame{font-size:86px;filter:drop-shadow(0 0 30px rgba(255,126,0,.5));animation:pulse 1.9s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.live-board{display:grid;gap:12px}.live-row{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:18px;border-radius:16px;background:rgba(255,255,255,.045)}
+.live-row small{display:block;opacity:.7;margin-top:4px}.live-xp{font-weight:800;color:#ffb347}
+.mission{padding:24px;border-radius:20px;background:linear-gradient(135deg,rgba(255,159,28,.14),rgba(255,90,54,.08));border:1px solid rgba(255,159,28,.25)}
+@media(max-width:780px){.live-stats{grid-template-columns:repeat(2,1fr)}.live-row{grid-template-columns:1fr}.live-xp{text-align:left}.live-flame{font-size:66px}}
+</style>
+</head>
+<body>
+<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK</b></a><div class="version-pill">LIVE v1.3.0</div></header>
+<main class="container live-wrap">
+<section class="live-hero">
+  <div class="live-flame">🔥</div>
+  <p class="eyebrow">GLOBAL SPARK LIVE</p>
+  <h1>좋은 행동이<br>세상을 밝힙니다</h1>
+  <p class="live-sub">휴대폰이 없어도 괜찮습니다. 가까운 어른이 발견하고 인정한 좋은 행동이 SPARK가 됩니다.</p>
+</section>
+
+<section class="live-stats">
+  <div class="live-stat"><b id="liveToday">0</b><span>오늘의 SPARK</span></div>
+  <div class="live-stat"><b id="liveWeek">0</b><span>이번 주 SPARK</span></div>
+  <div class="live-stat"><b id="liveCenters">0</b><span>참여 센터</span></div>
+  <div class="live-stat"><b id="liveXp">0</b><span>누적 SPARK XP</span></div>
+</section>
+
+<section class="section mission">
+  <p class="eyebrow">THIS WEEK MISSION</p>
+  <h2>“그거 SPARK다!” — 좋은 행동 발견하기</h2>
+  <p>이번 주에는 주변의 좋은 행동을 발견하고 서로 인정해 주세요. 작은 실천 하나가 우리 센터와 지역, 그리고 세상을 밝힙니다.</p>
+</section>
+
+<section class="section">
+  <div class="panel-head"><div><p class="eyebrow">CENTER LIVE</p><h2>오늘 빛난 SPARK 센터</h2></div><button id="refreshLiveBtn" class="secondary" type="button">새로고침</button></div>
+  <div id="centerLiveBoard" class="live-board"><p class="empty">불러오는 중…</p></div>
+</section>
+
+<section class="section">
+  <p class="eyebrow">FIRST PILOT</p>
+  <h2>GLOBAL SPARK 제1호 실증센터</h2>
+  <div class="live-row"><div><b>🔥 계명태권도 · 대한민국 울산</b><small>아이의 좋은 행동을 발견하고, 기록하고, 세상과 연결합니다.</small></div><div class="live-xp">CENTER No.000001</div></div>
+</section>
+
+<section class="section">
+  <h2>우리 기관도 SPARK CENTER가 될 수 있습니다.</h2>
+  <p>태권도장, 미술학원, 피아노학원, 공부방, 스포츠클럽, 교회, 학교, 지역아동센터 등 아이의 좋은 행동을 발견하는 곳이라면 함께할 수 있습니다.</p>
+</section>
+</main>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/spark-data.js"></script>
+<script src="assets/js/spark-live.js"></script>
+</body></html>

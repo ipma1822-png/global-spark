@@ -1,4 +1,4 @@
-// GLOBAL SPARK HQ v1.2.0
+// GLOBAL SPARK HQ v1.3.0
 // Authenticated Supabase MVP adapter for the independent GLOBAL SPARK project.
 (function () {
   const SESSION_KEY = "globalSparkSession.v080";
@@ -116,6 +116,9 @@
   async function getCenterGrowth() {
     return rpc("spark_get_center_growth", {p_center_code:cfg.centerCode});
   }
+  async function getPublicLive() {
+    return publicRpc("spark_get_public_live", {});
+  }
 
   window.SparkData = {
     configured,
@@ -123,6 +126,6 @@
     readSession, isSignedIn, signIn, signOut,
     rpc, getCenterMembers, registerActivity,
     getMemberSummary, getMemberRecent, getCenterRecent, undoLast,
-    createMemberShare, revokeMemberShares, getPublicShare, getCenterGrowth, publicRpc
+    createMemberShare, revokeMemberShares, getPublicShare, getCenterGrowth, getPublicLive, publicRpc
   };
 })();
