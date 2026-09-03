@@ -1,50 +1,31 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1020">
-<title>GLOBAL SPARK HQ ADMIN · PHASE 2-2 · v2.2.0</title>
-<link rel="stylesheet" href="assets/css/style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1020">
+<title>GLOBAL SPARK HQ ADMIN · PHASE 2-3 · v2.3.0</title><link rel="stylesheet" href="assets/css/style.css">
 <style>
-.hq-wrap{max-width:1180px;margin:auto}.login-box,.hq-panel{padding:20px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}
-.form-row{display:flex;gap:10px;flex-wrap:wrap}.form-row input,.form-row select,.review-note{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#0f172a;color:white}
-.form-row input{flex:1;min-width:220px}.requests{display:grid;gap:12px;margin-top:16px}
-.req{padding:16px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
-.req-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.req-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.req-meta div{padding:10px;border-radius:10px;background:rgba(255,255,255,.035)}
-.actions{display:flex;gap:8px;flex-wrap:wrap}.status{font-size:.78rem;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.08)}
-@media(max-width:760px){.req-meta{grid-template-columns:1fr}.req-head{display:grid}}
-</style>
-</head>
+.hq-wrap{max-width:1180px;margin:auto}.login-box,.hq-panel{padding:20px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}.form-row{display:flex;gap:10px;flex-wrap:wrap}.form-row input,.form-row select,.form-row textarea,.review-note{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#0f172a;color:white}.form-row input,.form-row textarea{flex:1;min-width:220px}.requests,.mission-admin-list{display:grid;gap:12px;margin-top:16px}.req,.mission-admin-card{padding:16px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}.req-head,.mission-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.req-meta,.mission-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.req-meta div,.mission-meta div{padding:10px;border-radius:10px;background:rgba(255,255,255,.035)}.actions{display:flex;gap:8px;flex-wrap:wrap}.status{font-size:.78rem;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.08)}.mission-form{display:grid;gap:10px}.mission-form textarea{min-height:90px;width:100%;box-sizing:border-box}.mission-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.mission-grid>*{min-width:0}.tiny-note{opacity:.72;font-size:.82rem}@media(max-width:760px){.req-meta,.mission-meta,.mission-grid{grid-template-columns:1fr}.req-head,.mission-head{display:grid}}
+</style></head>
 <body>
-<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK HQ</b></a><div class="version-pill">PHASE 2-2 · v2.2.0</div></header>
+<header class="site-header"><a class="brand" href="index.html">🔥 <b>GLOBAL SPARK HQ</b></a><div class="version-pill">PHASE 2-3 · v2.3.0</div></header>
 <main class="container hq-wrap">
-<section class="hero compact"><p class="eyebrow">GLOBAL HEADQUARTERS</p><h1>SPARK 본부 운영센터</h1><p class="lead">센터 참여 신청을 검토하고, 승인 시 공식 SPARK CENTER 번호를 자동 발급합니다.</p></section>
-
-<section id="loginBox" class="login-box">
-  <h2>본부 관리자 로그인</h2>
-  <div class="form-row"><input id="hqEmail" type="email" placeholder="이메일"><input id="hqPassword" type="password" placeholder="비밀번호"><button id="hqLoginBtn" class="primary" type="button">로그인</button></div>
-  <p id="hqLoginMsg" class="tiny"></p>
-</section>
-
+<section class="hero compact"><p class="eyebrow">GLOBAL HEADQUARTERS</p><h1>SPARK 본부 운영센터</h1><p class="lead">센터 운영과 SPARK MISSION을 관리합니다.</p></section>
+<section id="loginBox" class="login-box"><h2>본부 관리자 로그인</h2><div class="form-row"><input id="hqEmail" type="email" placeholder="이메일"><input id="hqPassword" type="password" placeholder="비밀번호"><button id="hqLoginBtn" class="primary" type="button">로그인</button></div><p id="hqLoginMsg" class="tiny"></p></section>
 <section id="adminBox" class="hq-panel" hidden>
-  <div class="panel-head">
-    <div><p class="eyebrow">CENTER APPLICATIONS</p><h2>SPARK CENTER 참여 신청</h2></div>
-    <div class="form-row"><select id="statusFilter"><option value="all">전체</option><option value="new">신규</option><option value="reviewing">검토중</option><option value="approved">승인</option><option value="rejected">거절</option></select><button id="refreshRequestsBtn" class="secondary" type="button">새로고침</button></div>
-  </div>
-  <div id="requestList" class="requests"><p class="empty">불러오는 중…</p></div>
+ <div class="panel-head"><div><p class="eyebrow">CENTER APPLICATIONS</p><h2>SPARK CENTER 참여 신청</h2></div><div class="form-row"><select id="statusFilter"><option value="all">전체</option><option value="new">신규</option><option value="reviewing">검토중</option><option value="approved">승인</option><option value="rejected">거절</option></select><button id="refreshRequestsBtn" class="secondary" type="button">새로고침</button></div></div><div id="requestList" class="requests"><p class="empty">불러오는 중…</p></div>
 </section>
-
-<section id="leaderAssignBox" class="hq-panel" style="margin-top:18px">
-  <p class="eyebrow">CENTER LEADER</p><h2>승인 센터 지도자 연결</h2>
-  <p>승인된 공식 센터번호와 Supabase Auth에 등록된 지도자 이메일을 연결합니다.</p>
-  <div class="form-row">
-    <input id="leaderCenterCode" placeholder="예: SPK-000002">
-    <input id="leaderEmail" type="email" placeholder="지도자 로그인 이메일">
-    <button id="assignLeaderBtn" class="primary" type="button">지도자 연결</button>
-  </div>
-  <p id="leaderAssignMsg" class="tiny"></p>
+<section id="missionAdminBox" class="hq-panel" style="margin-top:18px" hidden>
+ <p class="eyebrow">SPARK MISSION v1.0</p><h2>MISSION 만들기</h2><p class="tiny-note">MISSION 완료는 이번 PHASE에서 확인 기록만 남기며 별도 XP를 지급하지 않습니다.</p>
+ <input id="missionId" type="hidden">
+ <div class="mission-form">
+  <div class="form-row"><input id="missionTitle" maxlength="100" placeholder="MISSION 제목"><input id="missionTarget" maxlength="40" placeholder="대상 예: 어린이·청소년"></div>
+  <div class="form-row"><textarea id="missionDescription" maxlength="1000" placeholder="현실에서 무엇을 하면 되는지 짧고 분명하게 적어 주세요."></textarea></div>
+  <div class="mission-grid"><select id="missionFlame"><option>GOOD</option><option>SAFE</option><option>EARTH</option><option>CHALLENGE</option><option>CITIZEN</option></select><select id="missionDifficulty"><option value="easy">쉬움</option><option value="normal">보통</option><option value="challenge">도전</option></select><select id="missionParticipation"><option value="solo">혼자</option><option value="friends">친구와</option><option value="family">가족과</option><option value="center">센터와</option><option value="community">지역사회와</option></select><input id="missionEndsAt" type="datetime-local" aria-label="종료일"></div>
+  <div class="form-row"><textarea id="missionSafety" maxlength="500" placeholder="안전안내. SAFE 미션은 위험 접근 금지·보호자/지도자 알림·신고/대피 우선 원칙을 적어 주세요."></textarea></div>
+  <div class="actions"><button id="saveMissionBtn" class="primary" type="button">MISSION 저장</button><button id="clearMissionBtn" class="secondary" type="button">새로 작성</button><button id="refreshMissionsBtn" class="secondary" type="button">목록 새로고침</button></div><p id="missionMsg" class="tiny"></p>
+ </div><div id="missionAdminList" class="mission-admin-list"><p class="empty">불러오는 중…</p></div>
 </section>
-
+<section id="leaderAssignBox" class="hq-panel" style="margin-top:18px"><p class="eyebrow">CENTER LEADER</p><h2>승인 센터 지도자 연결</h2><p>승인된 공식 센터번호와 Supabase Auth에 등록된 지도자 이메일을 연결합니다.</p><div class="form-row"><input id="leaderCenterCode" placeholder="예: SPK-000002"><input id="leaderEmail" type="email" placeholder="지도자 로그인 이메일"><button id="assignLeaderBtn" class="primary" type="button">지도자 연결</button></div><p id="leaderAssignMsg" class="tiny"></p></section>
 </main>
 <script src="assets/js/config.js"></script><script src="assets/js/spark-data.js"></script><script src="assets/js/hq-admin.js"></script>
 </body></html>
