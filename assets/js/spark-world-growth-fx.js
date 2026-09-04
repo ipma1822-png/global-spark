@@ -1,0 +1,7 @@
+// GLOBAL SPARK · SPARK WORLD GAMEIFICATION 03 · seven-stage character growth presentation
+(function(){
+ const TITLES={ember:'마음속에 작은 불씨가 생겼어요!',growing:'눈을 뜨고 세상을 바라봐요!',strong:'행동으로 도전하기 시작해요!',radiant:'배우고 익히며 실력이 자라요!',fighter:'함께하며 리더십이 자라요!',hero:'세상을 지키는 용기와 책임이 생겨요!', 'global-leader':'세계와 함께 더 큰 빛을 나누어요!'};
+ function apply(state){if(!state?.stage)return;const s=state.stage,hero=document.querySelector('.world-hero'),character=document.getElementById('character'),chip=document.getElementById('stageChip');document.body.dataset.sparkStage=s.key;hero?.setAttribute('data-stage',String(s.index+1));if(character){character.dataset.stage=s.key;character.alt=`${s.index+1}단계 ${s.name}`;character.classList.remove('stage-arrive');requestAnimationFrame(()=>character.classList.add('stage-arrive'))}if(chip){chip.innerHTML=`<b>${s.index+1}단계 · ${s.name}</b><span>${TITLES[s.key]||s.subtitle||''}</span>`}renderStageHud(state)}
+ function renderStageHud(state){let hud=document.getElementById('growthHud');if(!hud){hud=document.createElement('div');hud.id='growthHud';hud.className='growth-hud';const zone=document.querySelector('.character-zone');zone?.appendChild(hud)}const s=state.stage,n=s.next;hud.innerHTML=`<span class="growth-number">${s.index+1}</span><div><b>${s.name}</b><small>${n?`다음 ${n.name}까지 ${state.xp.toNext} XP`:'최고 성장 단계'}</small></div>`}
+ document.addEventListener('spark-world:state',e=>apply(e.detail));if(window.SPARK_WORLD_STATE)apply(window.SPARK_WORLD_STATE);
+})();
