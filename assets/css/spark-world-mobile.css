@@ -1,0 +1,25 @@
+/* GLOBAL SPARK · GAMEIFICATION 14 · mobile fullscreen optimization */
+@media (max-width:700px){
+ html,body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-y:contain;-webkit-tap-highlight-color:transparent}
+ body.spark-game-home{min-height:100svh;background-attachment:fixed}
+ .world{width:100%;max-width:none;padding:0 10px calc(104px + env(safe-area-inset-bottom))}
+ .world-head{min-height:54px;margin:0 -10px 8px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;top:0}
+ .world-brand{font-size:.82rem;white-space:nowrap}.world-version{display:none}.sound-toggle{width:40px;height:40px;touch-action:manipulation}
+ .world-hero{min-height:calc(100svh - 74px);border-radius:0 0 28px 28px;margin:0 -10px;padding:18px 12px 22px;display:flex;flex-direction:column;justify-content:center}
+ .eyebrow{font-size:.78rem;margin:0}.hello{font-size:clamp(2rem,10vw,3rem);margin:5px 0}.sub{font-size:.78rem;margin:0 auto 7px;max-width:340px}.stage-chip{align-self:center;font-size:.7rem;gap:5px;max-width:94%;white-space:normal}
+ .character-zone{height:min(34svh,290px);min-height:210px}.flame{width:min(60vw,245px);height:min(60vw,245px)}
+ .score-row{width:100%;gap:6px}.score{padding:9px 3px;border-radius:14px}.score small{font-size:.62rem}.score b{font-size:.84rem}.bar-wrap{width:100%;margin:9px auto 0}.bar{height:11px}
+ .section{padding-top:22px;scroll-margin-top:64px}.section h2{font-size:1.08rem}.help{font-size:.75rem;line-height:1.45}
+ .action-panel,.campaign-card,.item-board,.world-map-board,.quest-board{border-radius:20px;padding:13px}.self-note{font-size:.76rem}
+ .action-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.action{min-height:82px;padding:10px;font-size:.78rem;touch-action:manipulation}
+ textarea{font-size:16px;min-height:70px}.big-submit,.campaign-action{min-height:50px;font-size:.9rem;touch-action:manipulation}
+ .flame-grid,.road,.world-map-track{scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}.flame-grid::-webkit-scrollbar,.road::-webkit-scrollbar,.world-map-track::-webkit-scrollbar{display:none}.flame-card,.stage,.world-map-node{scroll-snap-align:center}
+ .item-slots{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.item-slot{min-width:0;touch-action:manipulation}
+ .treasure-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .recent-item{gap:8px;font-size:.78rem}
+ .dock{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));transform:none;width:auto;min-height:64px;border-radius:20px;padding:5px;backdrop-filter:blur(18px);box-shadow:0 10px 34px #000a}
+ .dock button{min-height:52px;font-size:.61rem;border-radius:14px;touch-action:manipulation}.dock button:active{background:#ffffff12;transform:scale(.96)}.dock span{font-size:1.2rem;margin-bottom:2px}
+ .reward-burst,.reward-reveal,.levelup-card{max-width:calc(100vw - 28px)}
+}
+@media (max-width:380px){.world-brand{font-size:.72rem}.hello{font-size:1.9rem}.character-zone{min-height:190px}.flame{width:56vw;height:56vw}.score small{font-size:.56rem}.score b{font-size:.76rem}.item-slots{grid-template-columns:repeat(2,minmax(0,1fr))}.dock button{font-size:.55rem}}
+@media (orientation:landscape) and (max-height:520px){.world-hero{min-height:auto;padding:12px}.character-zone{height:150px;min-height:150px}.flame{width:145px;height:145px}.hello{font-size:1.8rem}.sub{display:none}.score-row{max-width:520px}.dock{min-height:54px}.dock button{min-height:44px}}
