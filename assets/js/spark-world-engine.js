@@ -1,8 +1,8 @@
-// GLOBAL SPARK · SPARK WORLD GAMEIFICATION 01 · game-state adapter
-// Read-only presentation engine. Existing XP/ledger/mission/campaign engines remain authoritative.
+// GLOBAL SPARK · SPARK WORLD PHASE 10 · v2.22.0 · integrated state adapter
+// Existing ledger/mission/campaign engines remain authoritative.
 (function(){
   const g=window.SPARK_GROWTH;
-  if(!g) return;
+  if(!g)return;
   const FLAME_ORDER=['GOOD','SAFE','EARTH','CHALLENGE','CITIZEN'];
   const REWARDS=[
     {key:'adventure-bag',min:0,label:'첫 모험 가방',icon:'🎒'},
@@ -16,7 +16,8 @@
   ];
   const n=v=>Number(v||0);
   function flameCounts(rows){const out=Object.fromEntries(FLAME_ORDER.map(k=>[k,0]));(rows||[]).forEach(r=>{if(n(r.net_xp??r.xp)>0){const k=r.flame_code||g.activityFlame[r.activity_type];if(out[k]!==undefined)out[k]++}});return out}
-  function make(input={}){const total=n(input.total_xp),level=n(input.level)||Math.floor(total/100)+1,stage=g.stageForXp(total),next=g.nextStageForXp(total),idx=g.stageIndexForXp(total),counts=flameCounts(input.recent),progress=next?Math.max(0,Math.min(100,((total-stage.min)/(next.min-stage.min))*100)):100;return Object.freeze({member:{id:input.id||'',name:input.name||'친구'},xp:{total,level,progress,toNext:next?Math.max(0,next.min-total):0},stage:{...stage,index:idx,next:next?{...next}:null},flames:counts,rewards:REWARDS.map(x=>({...x,unlocked:total>=x.min})),recent:[...(input.recent||[])],badges:[...(input.badges||[])],campaigns:[...(input.campaigns||[])]})}
+  function normalizedFlames(input){if(input?.flames&&typeof input.flames==='object')return Object.fromEntries(FLAME_ORDER.map(k=>[k,n(input.flames[k])]));return flameCounts(input?.recent)}
+  function make(input={}){const total=n(input.total_xp),level=n(input.level)||Math.floor(total/100)+1,stage=g.stageForXp(total),next=g.nextStageForXp(total),idx=g.stageIndexForXp(total),counts=normalizedFlames(input),progress=next?Math.max(0,Math.min(100,((total-stage.min)/(next.min-stage.min))*100)):100;return Object.freeze({member:{id:input.id||'',name:input.name||'친구'},center:input.center||null,xp:{total,level,progress,toNext:next?Math.max(0,next.min-total):0},stage:{...stage,index:idx,next:next?{...next}:null},flames:counts,flameScope:input?.flames?'lifetime':'recent',rewards:REWARDS.map(x=>({...x,unlocked:total>=x.min})),recent:[...(input.recent||[])],badges:[...(input.badges||[])],campaigns:[...(input.campaigns||[])]})}
   function emit(state){window.SPARK_WORLD_STATE=state;document.dispatchEvent(new CustomEvent('spark-world:state',{detail:state}));return state}
-  window.SPARK_WORLD_ENGINE={version:'1.0.0',flameOrder:FLAME_ORDER,rewards:REWARDS,make,emit};
+  window.SPARK_WORLD_ENGINE={version:'10.0.0',flameOrder:FLAME_ORDER,rewards:REWARDS,make,emit};
 })();
