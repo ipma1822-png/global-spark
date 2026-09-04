@@ -1,8 +1,8 @@
-// GLOBAL SPARK PHASE 2-5.1 · v2.5.1
+// GLOBAL SPARK PHASE 2-5.2 · v2.5.2
 (async function(){
   const $=id=>document.getElementById(id), params=new URLSearchParams(location.search); let memberId=params.get('member'),members=[],toastTimer;
   const pLabels={solo:'혼자',friends:'친구와',family:'가족과',center:'센터와',community:'지역사회와'};
-  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
   function toast(t){clearTimeout(toastTimer);$('toast').textContent=t;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,2500)}
   function msg(t){$('myRecent').innerHTML=`<p class="empty">${esc(t)}</p>`}
   function buildUrl(id){const u=new URL(location.href);u.searchParams.set('member',id);return u.toString()}
