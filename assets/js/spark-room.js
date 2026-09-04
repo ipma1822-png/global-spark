@@ -1,9 +1,9 @@
-// GLOBAL SPARK · SPARK WORLD PHASE 5 · v2.17.0 · mission clear + XP/flame reward
+// GLOBAL SPARK · SPARK WORLD PHASE 6 · v2.18.0 · LEVEL / 등급 상승
 (async function(){
  const $=id=>document.getElementById(id),p=new URLSearchParams(location.search),kid=p.get('kid')||'',member=p.get('member')||'',center=p.get('center')||'',centerMode=!!(member&&center&&window.SparkData?.isSignedIn?.()),g=window.SPARK_GROWTH;let selected='',rules=[],campaignRows=[];
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- document.title='SPARK WORLD · v2.17.0';
- const versionEl=document.querySelector('.world-version');if(versionEl)versionEl.textContent='PHASE 5 · v2.17.0';
+ document.title='SPARK WORLD · v2.18.0';
+ const versionEl=document.querySelector('.world-version');if(versionEl)versionEl.textContent='PHASE 6 · v2.18.0';
  const escName=s=>esc(String(s||'친구').trim().slice(0,24));
  function status(t,e=false){$('status').textContent=t;$('status').classList.toggle('error',e)}function time(v){try{return new Date(v).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}catch{return''}}
  function reward(title,xp,icon='🔥',flameCode='',mission=true){if(window.SPARK_WORLD_REWARDS)return SPARK_WORLD_REWARDS.burst({title,xp,icon,flameCode,mission});$('celebrateName').textContent=title;$('celebrateXp').textContent='+'+xp+' XP';$('celebrate').classList.add('show');setTimeout(()=>$('celebrate').classList.remove('show'),1300)}
