@@ -1,0 +1,6 @@
+// GLOBAL SPARK · SPARK WORLD GAMEIFICATION 04 · living character motion
+(function(){
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ function setup(){const zone=document.querySelector('.character-zone'),ch=document.getElementById('character');if(!zone||!ch||zone.querySelector('.spark-motion-layer'))return;const layer=document.createElement('div');layer.className='spark-motion-layer';layer.setAttribute('aria-hidden','true');layer.innerHTML='<i class="spark-orbit orbit-a">✦</i><i class="spark-orbit orbit-b">✧</i><i class="spark-orbit orbit-c">•</i><i class="spark-glint glint-a">✦</i><i class="spark-glint glint-b">✦</i><span class="spark-ground-glow"></span>';zone.prepend(layer);if(reduce)return;let raf=0;zone.addEventListener('pointermove',e=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const r=zone.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;ch.style.setProperty('--spark-look-x',(x*7).toFixed(2)+'px');ch.style.setProperty('--spark-look-y',(y*4).toFixed(2)+'px')})},{passive:true});zone.addEventListener('pointerleave',()=>{ch.style.setProperty('--spark-look-x','0px');ch.style.setProperty('--spark-look-y','0px')})}
+ document.addEventListener('DOMContentLoaded',setup,{once:true});document.addEventListener('spark-world:state',setup);
+})();
