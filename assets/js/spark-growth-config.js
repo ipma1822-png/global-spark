@@ -1,4 +1,4 @@
-// GLOBAL SPARK PHASE 2-5 · v2.5.0 · 화면 연출용 자산/분류 매핑
+// GLOBAL SPARK PHASE 2-5.2 · v2.5.2 · 화면 연출용 자산/분류 매핑
 // 공식 디자인 교체 시 이 파일의 asset 경로와 정적 자산만 바꾼다.
 (function(){
   const base='assets/spark';
