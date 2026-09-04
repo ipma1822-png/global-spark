@@ -1,4 +1,4 @@
-// GLOBAL SPARK PHASE 2-5 · v2.5.0
+// GLOBAL SPARK PHASE 2-5.1 · v2.5.1
 (async function(){
   const $=id=>document.getElementById(id), params=new URLSearchParams(location.search); let memberId=params.get('member'),members=[],toastTimer;
   const pLabels={solo:'혼자',friends:'친구와',family:'가족과',center:'센터와',community:'지역사회와'};
@@ -7,58 +7,11 @@
   function msg(t){$('myRecent').innerHTML=`<p class="empty">${esc(t)}</p>`}
   function buildUrl(id){const u=new URL(location.href);u.searchParams.set('member',id);return u.toString()}
   async function copy(text){try{await navigator.clipboard.writeText(text);toast('링크를 복사했습니다.')}catch(_){$('shareUrl').select();document.execCommand('copy');toast('링크를 복사했습니다.')}}
-
-  function renderBadges(total){
-    const badges=[
-      {min:5,icon:'🔥',name:'첫 SPARK'},
-      {min:25,icon:'✨',name:'꾸준한 시작'},
-      {min:50,icon:'🌱',name:'성장 중'},
-      {min:100,icon:'🚀',name:'LEVEL UP'}
-    ];
-    $('badgeRow').innerHTML=badges.map(b=>`<div class="badge-chip ${total>=b.min?'':'locked'}"><div style="font-size:1.6rem">${b.icon}</div>${esc(b.name)}<small style="display:block;opacity:.68">${total>=b.min?'획득':'잠김 · '+b.min+' XP'}</small></div>`).join('');
-  }
-
-  function renderStages(total){
-    const growth=window.SPARK_GROWTH,idx=growth.stageIndexForXp(total);
-    $('stageTrack').innerHTML=growth.stages.map((s,i)=>`<div class="stage-step ${i===idx?'active':i<idx?'done':''}"><small>STAGE ${i+1}</small><b>${esc(s.name)}</b><small>${s.min} XP+</small></div>`).join('');
-  }
-
-  function renderFlames(recent){
-    const growth=window.SPARK_GROWTH,counts={GOOD:0,SAFE:0,EARTH:0,CHALLENGE:0,CITIZEN:0};
-    recent.forEach(r=>{if(Number(r.net_xp)<=0)return;const code=growth.activityFlame[r.activity_type];if(code)counts[code]+=1});
-    $('flameGrid').innerHTML=Object.values(growth.flames).map(f=>`<article class="card flame-card ${counts[f.code]?'active':''}"><img src="${f.asset}" alt="${esc(f.name)}"><strong>${f.code}</strong><small>${f.name}</small><span class="flame-count">최근 ${counts[f.code]}회</span></article>`).join('');
-    const next=Object.keys(counts).sort((a,b)=>counts[a]-counts[b])[0];
-    $('nextActionMessage').textContent=counts[next]===0?`${growth.flames[next].name}을 깨울 수 있는 안전한 현실 행동을 하나 찾아보세요.`:`최근 활동 중 ${growth.flames[next].name}이 가장 적어요. 오늘은 이 불꽃을 키울 작은 행동에 도전해보세요.`;
-  }
-
-  function renderMissions(rows){$('missionList').innerHTML=rows.length?rows.map(m=>`<article class="mission-card ${m.completed?'done':''}"><div class="mission-meta">${esc(m.flame_code)} · ${esc(m.target_label||'모두')} · ${esc(pLabels[m.participation_type]||m.participation_type)} · ${esc(m.difficulty)}</div><h3>${m.completed?'✅ ':''}${esc(m.title)}</h3><p>${esc(m.description)}</p>${m.safety_guide?`<p class="safety">🛡 ${esc(m.safety_guide)}</p>`:''}<small>${m.completed?'센터 확인 완료':'현실에서 행동한 뒤 센터 지도자에게 알려주세요.'}</small></article>`).join(''):'<p class="empty">현재 공개된 MISSION이 없습니다.</p>'}
-
-  function renderGrowth(total,summary){
-    const growth=window.SPARK_GROWTH,stage=growth.stageForXp(total),nextStage=growth.nextStageForXp(total),flame=$('sparkFlame');
-    flame.src=stage.asset;flame.alt=`${stage.name} 성장 캐릭터`;$('stageName').textContent=stage.name;$('stageSubtitle').textContent=stage.subtitle;$('growthTitle').textContent=`${stage.name} · ${stage.subtitle}`;
-    const remainStage=nextStage?Math.max(0,nextStage.min-total):0;
-    if(nextStage){$('growthMessage').textContent=`현실의 작은 실천이 쌓이고 있어요. ${remainStage} XP를 더 쌓으면 ${nextStage.name} 단계가 열립니다.`}
-    else{$('growthMessage').textContent='7단계 글로벌 리더 불꽃까지 성장했습니다. 이제 더 많은 사람과 세상을 밝히는 행동을 이어가세요.'}
-    renderStages(total);renderBadges(total);
-    const level=Number(summary.level||1),levelStart=(level-1)*100,nextLevel=Number(summary.next_level_xp||level*100),remain=Math.max(0,nextLevel-total),pct=Math.max(0,Math.min(100,((total-levelStart)/100)*100));
-    $('next').textContent=nextStage?`${nextStage.name}까지 ${remainStage} XP`:'최고 성장단계';$('progressBar').style.width=pct+'%';$('progressText').textContent=`LEVEL ${level} 진행률 ${Math.round(pct)}% · 다음 LEVEL까지 ${remain} XP`;
-  }
-
-  async function load(id){
-    memberId=id;const u=new URL(location.href);u.searchParams.set('member',id);history.replaceState(null,'',u);$('shareUrl').value=u.toString();$('missionList').innerHTML='<p class="empty">MISSION 불러오는 중…</p>';
-    try{
-      const [summary,recent,missions]=await Promise.all([SparkData.getMemberSummary(id),SparkData.getMemberRecent(id,20),SparkData.memberMissions(id)]);
-      $('memberName').textContent=summary.display_name;$('xp').textContent=`${summary.total_xp} XP`;$('level').textContent=`LEVEL ${summary.level}`;
-      const total=Number(summary.total_xp||0);renderGrowth(total,summary);renderFlames(recent);renderMissions(missions);
-      $('myRecent').innerHTML=recent.length?recent.map(r=>{const code=window.SPARK_GROWTH.activityFlame[r.activity_type]||'GOOD',f=window.SPARK_GROWTH.flames[code];return `<div class="recent-item"><div><b>${f.code} · ${esc(r.label_ko)}</b><small>${new Date(r.created_at).toLocaleString('ko-KR')}</small></div><div class="xp">${Number(r.net_xp)>0?'+':''}${r.net_xp} XP</div></div>`}).join(''):'<p class="empty">아직 등록된 SPARK 활동이 없습니다.</p>';
-    }catch(e){console.error(e);msg('MY SPARK 데이터를 불러오지 못했습니다.');$('missionList').innerHTML='<p class="empty">MISSION을 불러오지 못했습니다.</p>'}
-  }
-
+  function renderBadges(total){const badges=[{min:5,icon:'🔥',name:'첫 SPARK'},{min:25,icon:'✨',name:'꾸준한 시작'},{min:50,icon:'🌱',name:'성장 중'},{min:100,icon:'🚀',name:'LEVEL UP'}];$('badgeRow').innerHTML=badges.map(b=>`<div class="badge-chip ${total>=b.min?'':'locked'}"><div style="font-size:1.6rem">${b.icon}</div>${esc(b.name)}<small style="display:block;opacity:.68">${total>=b.min?'획득!':'다음 목표 · '+b.min+' XP'}</small></div>`).join('')}
+  function renderStages(total){const growth=window.SPARK_GROWTH,idx=growth.stageIndexForXp(total);$('stageTrack').innerHTML=growth.stages.map((s,i)=>`<div class="stage-step ${i===idx?'active':i<idx?'done':''}"><small>STAGE ${i+1}</small><b>${esc(s.name)}</b><small>${s.min} XP+</small></div>`).join('')}
+  function renderFlames(recent){const growth=window.SPARK_GROWTH,counts={GOOD:0,SAFE:0,EARTH:0,CHALLENGE:0,CITIZEN:0};recent.forEach(r=>{if(Number(r.net_xp)<=0)return;const code=growth.activityFlame[r.activity_type];if(code)counts[code]+=1});$('flameGrid').innerHTML=Object.values(growth.flames).map(f=>`<article class="card flame-card ${counts[f.code]?'active':''}"><img src="${f.asset}" alt="${esc(f.name)}"><strong>${f.code}</strong><small>${f.name}</small><span class="flame-count">${counts[f.code]?counts[f.code]+'번 빛남':'아직 잠든 불꽃'}</span></article>`).join('');const next=Object.keys(counts).sort((a,b)=>counts[a]-counts[b])[0];$('nextActionMessage').textContent=counts[next]===0?`${growth.flames[next].name}을 깨울 수 있는 안전한 현실 행동을 하나 찾아보세요.`:`오늘은 ${growth.flames[next].name}을 더 밝힐 작은 행동에 도전해보세요.`}
+  function renderMissions(rows){$('missionList').innerHTML=rows.length?rows.map(m=>`<article class="mission-card ${m.completed?'done':''}"><div class="mission-meta">${esc(m.flame_code)} · ${esc(m.target_label||'모두')} · ${esc(pLabels[m.participation_type]||m.participation_type)} · ${esc(m.difficulty)}</div><h3>${m.completed?'✅ ':''}${esc(m.title)}</h3><p>${esc(m.description)}</p>${m.safety_guide?`<p class="safety">🛡 ${esc(m.safety_guide)}</p>`:''}<small>${m.completed?'센터 확인 완료':'현실에서 행동한 뒤 센터 지도자에게 알려주세요.'}</small></article>`).join(''):'<p class="empty">지금 공개된 MISSION이 없습니다. 다음 불꽃을 기다려 주세요!</p>'}
+  function renderGrowth(total,summary){const growth=window.SPARK_GROWTH,stage=growth.stageForXp(total),nextStage=growth.nextStageForXp(total),flame=$('sparkFlame');flame.src=stage.asset;flame.alt=`${stage.name} 성장 캐릭터`;$('stageName').textContent=stage.name;$('stageSubtitle').textContent=stage.subtitle;$('growthTitle').textContent=`${stage.name} · ${stage.subtitle}`;const remainStage=nextStage?Math.max(0,nextStage.min-total):0;if(nextStage){$('growthMessage').textContent=`멋져요! 현실의 작은 실천이 쌓이고 있어요. ${remainStage} XP를 더 모으면 ${nextStage.name}가 깨어납니다.`}else{$('growthMessage').textContent='글로벌 리더 불꽃까지 성장했습니다! 이제 더 많은 사람과 세상을 밝히는 행동을 이어가세요.'}renderStages(total);renderBadges(total);const level=Number(summary.level||1),levelStart=(level-1)*100,nextLevel=Number(summary.next_level_xp||level*100),remain=Math.max(0,nextLevel-total),pct=Math.max(0,Math.min(100,((total-levelStart)/100)*100));$('next').textContent=nextStage?`${nextStage.name}까지 ${remainStage} XP`:'최고 성장단계';$('progressBar').style.width=pct+'%';$('progressText').textContent=`LEVEL ${level} 진행률 ${Math.round(pct)}% · 다음 LEVEL까지 ${remain} XP`}
+  async function load(id){memberId=id;const u=new URL(location.href);u.searchParams.set('member',id);history.replaceState(null,'',u);$('shareUrl').value=u.toString();$('missionList').innerHTML='<p class="empty">MISSION 불러오는 중…</p>';try{const [summary,recent,missions]=await Promise.all([SparkData.getMemberSummary(id),SparkData.getMemberRecent(id,20),SparkData.memberMissions(id)]);$('memberName').textContent=summary.display_name;$('xp').textContent=`${summary.total_xp} XP`;$('level').textContent=`LEVEL ${summary.level}`;const total=Number(summary.total_xp||0);renderGrowth(total,summary);renderFlames(recent);renderMissions(missions);$('myRecent').innerHTML=recent.length?recent.map(r=>{const code=window.SPARK_GROWTH.activityFlame[r.activity_type]||'GOOD',f=window.SPARK_GROWTH.flames[code];return `<div class="recent-item"><div><b>${f.code} · ${esc(r.label_ko)}</b><small>${new Date(r.created_at).toLocaleString('ko-KR')}</small></div><div class="xp">${Number(r.net_xp)>0?'+':''}${r.net_xp} XP</div></div>`}).join(''):'<p class="empty">아직 등록된 SPARK 활동이 없습니다.</p>'}catch(e){console.error(e);msg('MY SPARK 데이터를 불러오지 못했습니다.');$('missionList').innerHTML='<p class="empty">MISSION을 불러오지 못했습니다.</p>'}}
   if(!SparkData.isSignedIn()){$('memberName').textContent='지도자 로그인이 필요합니다';$('memberSelect').disabled=true;$('copyLinkBtn').disabled=true;$('shareCopyBtn').disabled=true;msg('먼저 SPARK CENTER에서 로그인해 주세요.');$('missionList').innerHTML='<p class="empty">지도자 로그인 후 확인할 수 있습니다.</p>';return}
-  try{
-    members=await SparkData.getCenterMembers();if(!members.length){msg('등록된 회원이 없습니다.');return}
-    $('memberSelect').innerHTML=members.map(m=>`<option value="${m.id}">${esc(m.display_name)} · ${esc(m.member_code)}</option>`).join('');if(!memberId||!members.some(m=>m.id===memberId))memberId=members[0].id;$('memberSelect').value=memberId;$('memberSelect').onchange=e=>load(e.target.value);$('copyLinkBtn').onclick=()=>copy(buildUrl($('memberSelect').value));$('shareCopyBtn').onclick=()=>copy($('shareUrl').value);
-    $('createParentShareBtn').onclick=async()=>{try{const r=await SparkData.createMemberShare($('memberSelect').value),token=r?.token;if(!token)throw new Error('TOKEN_NOT_RETURNED');const u=new URL('parent-spark.html',location.href);u.searchParams.set('share',token);$('parentShareUrl').value=u.toString();$('copyParentShareBtn').disabled=false;toast('부모 공유링크를 만들었습니다.')}catch(e){console.error(e);toast('공유링크 생성에 실패했습니다.')}};
-    $('revokeParentShareBtn').onclick=async()=>{if(!confirm('이 아이의 기존 부모 공유링크를 모두 해제할까요?'))return;try{await SparkData.revokeMemberShares($('memberSelect').value);$('parentShareUrl').value='';$('copyParentShareBtn').disabled=true;toast('기존 공유링크를 해제했습니다.')}catch(e){console.error(e);toast('공유링크 해제에 실패했습니다.')}};$('copyParentShareBtn').onclick=()=>copy($('parentShareUrl').value);await load(memberId);
-  }catch(e){console.error(e);msg('회원 목록을 불러오지 못했습니다.')}
-})();
+  try{members=await SparkData.getCenterMembers();if(!members.length){msg('등록된 회원이 없습니다.');return}$('memberSelect').innerHTML=members.map(m=>`<option value="${m.id}">${esc(m.display_name)} · ${esc(m.member_code)}</option>`).join('');if(!memberId||!members.some(m=>m.id===memberId))memberId=members[0].id;$('memberSelect').value=memberId;$('memberSelect').onchange=e=>load(e.target.value);$('copyLinkBtn').onclick=()=>copy(buildUrl($('memberSelect').value));$('shareCopyBtn').onclick=()=>copy($('shareUrl').value);$('createParentShareBtn').onclick=async()=>{try{const r=await SparkData.createMemberShare($('memberSelect').value),token=r?.token;if(!token)throw new Error('TOKEN_NOT_RETURNED');const u=new URL('parent-spark.html',location.href);u.searchParams.set('share',token);$('parentShareUrl').value=u.toString();$('copyParentShareBtn').disabled=false;toast('부모 공유링크를 만들었습니다.')}catch(e){console.error(e);toast('공유링크 생성에 실패했습니다.')}};$('revokeParentShareBtn').onclick=async()=>{if(!confirm('이 아이의 기존 부모 공유링크를 모두 해제할까요?'))return;try{await SparkData.revokeMemberShares($('memberSelect').value);$('parentShareUrl').value='';$('copyParentShareBtn').disabled=true;toast('기존 공유링크를 해제했습니다.')}catch(e){console.error(e);toast('공유링크 해제에 실패했습니다.')}};$('copyParentShareBtn').onclick=()=>copy($('parentShareUrl').value);await load(memberId)}catch(e){console.error(e);msg('회원 목록을 불러오지 못했습니다.')}})();
