@@ -1,4 +1,4 @@
-// GLOBAL SPARK · SPARK WORLD v2.8.0
+// GLOBAL SPARK · SPARK WORLD v2.8.1
 (async function(){
   const $=id=>document.getElementById(id);
   const params=new URLSearchParams(location.search);
@@ -9,12 +9,33 @@
   let selected='', dashboard=null, rules=[], lastRecent=[];
   const growth=window.SPARK_GROWTH;
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function setStatus(text,error=false){$('status').textContent=text;$('status').classList.toggle('error',!!error)}
+
+  document.title='SPARK WORLD · GLOBAL SPARK v2.8.1';
+  const versionEl=document.querySelector('.world-version');
+  if(versionEl)versionEl.textContent='PHASE 2-8 · v2.8.1';
+  const style=document.createElement('style');
+  style.textContent=`
+    .road .stage{opacity:1;overflow:hidden;position:relative;background:linear-gradient(160deg,#111b32,#091123);border:1px solid #31405b;transition:.28s ease;min-height:150px}
+    .road .stage img{width:64px;height:64px;margin:2px auto 4px;display:block;transition:.28s ease}
+    .road .stage.upcoming{background:linear-gradient(160deg,#101728,#080d18);border-color:#28344a;color:#8491a6}
+    .road .stage.upcoming img{filter:grayscale(1) brightness(.48) contrast(1.35);opacity:.72;drop-shadow:0 0 1px #fff}
+    .road .stage.done{background:linear-gradient(160deg,#2d2617,#12182a);border:1px solid #d79c36;box-shadow:inset 0 0 24px #ffb33312,0 0 18px #ffae2514}
+    .road .stage.done img{filter:drop-shadow(0 0 10px #ffb12e66)}
+    .road .stage.current{background:radial-gradient(circle at 50% 36%,#ffb52b2f,transparent 48%),linear-gradient(160deg,#3a2912,#11182b);border:2px solid #ffd35c;outline:none;box-shadow:0 0 0 2px #8e641c66,0 0 34px #ffb32666,inset 0 0 28px #ffce5a18;transform:translateY(-5px);animation:currentStageGlow 1.75s ease-in-out infinite}
+    .road .stage.current img{filter:drop-shadow(0 0 14px #ffc33d) drop-shadow(0 0 28px #ff8c23aa);transform:scale(1.08)}
+    .stage-step{position:absolute;left:8px;top:8px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.68rem;font-weight:950;background:#1a2438;color:#8998af;border:1px solid #3c4b65}
+    .stage.done .stage-step{background:#6c4b10;color:#ffe7a0;border-color:#d49a31}.stage.current .stage-step{background:#ffd356;color:#392000;border-color:#fff2aa;box-shadow:0 0 14px #ffc33d}
+    .stage-state{display:block;margin-top:5px;font-size:.62rem;font-weight:900;letter-spacing:.02em}.stage.upcoming .stage-state{color:#68778f}.stage.done .stage-state{color:#d9b257}.stage.current .stage-state{color:#ffe37b}
+    @keyframes currentStageGlow{50%{box-shadow:0 0 0 2px #a9782166,0 0 52px #ffc13990,inset 0 0 38px #ffd76a26}}
+  `;
+  document.head.appendChild(style);
+
+  function setStatus(text,error=false){const el=$('status');if(!el)return;el.textContent=text;el.classList.toggle('error',!!error)}
   function formatTime(v){try{return new Date(v).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}catch(_){return ''}}
   function ping(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const a=new C(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(660,a.currentTime);o.frequency.exponentialRampToValueAtTime(1040,a.currentTime+.16);g.gain.setValueAtTime(.055,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.28);o.start();o.stop(a.currentTime+.3)}catch(_){}}
   function renderGrowth(total,level){
     const stage=growth.stageForXp(total),next=growth.nextStageForXp(total),idx=growth.stageIndexForXp(total);
-    $('character').src=stage.asset+'?v=280';
+    $('character').src=stage.asset+'?v=281';
     $('xp').textContent=total+' XP';$('level').textContent='LEVEL '+level;
     $('next').textContent=next?Math.max(0,next.min-total)+' XP':'최고 단계';
     $('stageChip').textContent=`🔥 나의 불꽃 · ${stage.name}`;
@@ -24,7 +45,13 @@
     renderTreasures(total);
   }
   function renderRoad(total,idx){
-    $('growthRoad').innerHTML=growth.stages.map((s,i)=>`<div class="stage ${i<idx?'done':''} ${i===idx?'current':''}"><img src="${esc(s.asset)}?v=280" alt="${esc(s.name)}"><b>${esc(s.name)}</b><small>${s.min} XP부터</small></div>`).join('');
+    const road=$('growthRoad')||$('stageRoad');
+    if(!road)return;
+    road.innerHTML=growth.stages.map((s,i)=>{
+      const state=i<idx?'done':i===idx?'current':'upcoming';
+      const stateText=i<idx?'✨ 달성':i===idx?'🔥 현재 단계':`🔒 ${s.min} XP`;
+      return `<div class="stage ${state}"><span class="stage-step">${i+1}</span><img src="${esc(s.asset)}?v=281" alt="${esc(s.name)}"><b>${esc(s.name)}</b><small>${esc(s.subtitle||'')}</small><span class="stage-state">${stateText}</span></div>`;
+    }).join('');
   }
   function renderTreasures(total){
     const items=[
@@ -43,7 +70,7 @@
     const counts={GOOD:0,SAFE:0,EARTH:0,CHALLENGE:0,CITIZEN:0};
     (rows||[]).forEach(r=>{const code=growth.activityFlame[r.activity_type]||'GOOD';if(Number(r.net_xp??r.xp??0)>0)counts[code]=(counts[code]||0)+1});
     const order=['GOOD','SAFE','EARTH','CHALLENGE','CITIZEN'];
-    $('flameGrid').innerHTML=order.map(code=>{const f=growth.flames[code];return `<div class="flame-card"><img src="${esc(f.asset)}?v=280" alt="${esc(f.name)}"><b>${esc(f.name)}</b><strong>${counts[code]||0}</strong></div>`}).join('');
+    $('flameGrid').innerHTML=order.map(code=>{const f=growth.flames[code];return `<div class="flame-card"><img src="${esc(f.asset)}?v=281" alt="${esc(f.name)}"><b>${esc(f.name)}</b><strong>${counts[code]||0}</strong></div>`}).join('');
   }
   function renderRules(){
     $('actions').innerHTML=rules.map(r=>`<button type="button" class="action ${selected===r.activity_type?'selected':''}" data-type="${esc(r.activity_type)}"><strong>${esc(r.label_ko)}</strong><span>+${Number(r.xp||0)} XP · ${esc(growth.flames[r.flame_code]?.name||'불꽃')}</span></button>`).join('')||'<p class="help">지금 선택할 수 있는 활동이 없습니다.</p>';
@@ -52,7 +79,7 @@
     lastRecent=rows||[];renderFlames(lastRecent);
     $('recent').innerHTML=rows?.length?rows.map(r=>`<div class="recent-item"><div><b>${esc(r.label_ko||r.activity_type||'SPARK 활동')}</b><small>${formatTime(r.created_at)}</small></div><span class="plus">${Number(r.net_xp??r.xp??0)>=0?'+':''}${Number(r.net_xp??r.xp??0)} XP</span></div>`).join(''):'<p class="help" style="padding:14px">아직 기록이 없어요. 첫 불꽃을 밝혀보세요!</p>';
   }
-  function celebrate(xp,name){$('celebrateName').textContent=name||'멋진 행동!';$('celebrateXp').textContent='+'+xp+' XP';$('celebrate').classList.add('show');ping();setTimeout(()=>$('celebrate').classList.remove('show'),1350)}
+  function celebrate(xp,name){const n=$('celebrateName');if(n)n.textContent=name||'멋진 행동!';$('celebrateXp').textContent='+'+xp+' XP';$('celebrate').classList.add('show');ping();setTimeout(()=>$('celebrate').classList.remove('show'),1350)}
   async function reloadPublic(){
     dashboard=await SparkData.getKidDashboard(kidToken);
     const d=Array.isArray(dashboard)?dashboard[0]:dashboard;
@@ -76,7 +103,7 @@
     rules=Array.isArray(ruleRows)?ruleRows:[];renderRules();
   }
   async function reload(){return centerMode?reloadCenter():reloadPublic()}
-  document.querySelector('.dock').onclick=e=>{const b=e.target.closest('button[data-go]');if(!b)return;document.getElementById(b.dataset.go)?.scrollIntoView({behavior:'smooth',block:'start'})};
+  const dock=document.querySelector('.dock');if(dock)dock.onclick=e=>{const b=e.target.closest('button[data-go]');if(!b)return;document.getElementById(b.dataset.go)?.scrollIntoView({behavior:'smooth',block:'start'})};
   if(!centerMode&&!kidToken){$('hello').textContent='개인 링크가 필요해요';$('welcome').textContent='관장님이 보내준 내 SPARK 링크로 들어와 주세요.';$('activitySection').classList.add('hidden');$('recent').innerHTML='<p class="help" style="padding:14px">개인 링크로 들어오면 내 점수와 기록이 보여요.</p>';renderGrowth(0,1);renderFlames([]);return}
   $('actions').onclick=e=>{const b=e.target.closest('.action');if(!b)return;selected=b.dataset.type;renderRules();$('submit').disabled=false;setStatus('좋아요! 이제 내 불꽃을 키워볼까요?')};
   $('submit').onclick=async()=>{
