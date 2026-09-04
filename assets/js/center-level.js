@@ -1,0 +1,12 @@
+// GLOBAL SPARK · GB-05 center LEVEL & quality analysis · v3.21.0
+(function(){
+  const center=new URLSearchParams(location.search).get('center');
+  const root=document.getElementById('centerLevelPanel');
+  if(!center||!root||!window.SparkData)return;
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const labels={participation:'참여율',continuity:'꾸준함',flame_balance:'5대 불꽃 균형',activity_diversity:'활동 다양성',campaign:'캠페인 참여'};
+  const icons={participation:'👥',continuity:'📅',flame_balance:'🔥',activity_diversity:'🌱',campaign:'🌏'};
+  function drawMetric(key,m){const pct=Math.max(0,Math.min(100,Math.round(Number(m?.score||0)/Math.max(1,Number(m?.max||1))*100)));let detail='';if(key==='participation')detail=`최근 30일 ${Number(m.active_30d||0)}/${Number(m.members||0)}명 · ${Number(m.rate||0)}%`;if(key==='continuity')detail=`최근 ${Number(m.weeks_possible||0)}주 중 ${Number(m.active_weeks||0)}주 활동`;if(key==='flame_balance')detail=`5대 불꽃 ${Number(m.coverage||0)}/5 영역`;if(key==='activity_diversity')detail=`최근 30일 ${Number(m.types||0)}종 성장경험`;if(key==='campaign')detail=Number(m.campaigns||0)?`최근 캠페인 참여회원 ${Number(m.participating_members||0)}명`:'평가기간 공식 캠페인 없음 · 불이익 없음';return `<div class="level-metric"><div class="level-metric-head"><b>${icons[key]} ${labels[key]}</b><strong>${Number(m?.score||0)}/${Number(m?.max||0)}</strong></div><div class="level-track"><span style="width:${pct}%"></span></div><small>${esc(detail)}</small></div>`}
+  async function load(){root.innerHTML='<div class="level-loading">성장기지 운영품질을 분석하는 중…</div>';try{const raw=await SparkData.centerLevelAnalysis(center),d=Array.isArray(raw)?raw[0]:raw,m=d?.metrics||{};root.innerHTML=`<div class="level-summary"><div class="level-badge"><span>LEVEL ${Number(d.level_no||1)}</span><b>${esc(d.level_name||'새싹 성장기지')}</b><small>운영품질 ${Number(d.score||0)} / 100</small></div><div class="level-copy"><h3>많이 주는 센터보다, 함께 꾸준히 성장하는 센터</h3><p>회원 규모나 누적 SPARK 총량이 아니라 최근 운영의 참여·꾸준함·균형·다양성·공동체 참여를 평가합니다.</p></div></div><div class="level-metrics">${['participation','continuity','flame_balance','activity_diversity','campaign'].map(k=>drawMetric(k,m[k]||{})).join('')}</div><div class="level-recommend">💡 <b>이번 성장기지 추천</b><br>${esc(d.recommendation||'좋은 성장 흐름을 계속 이어가세요.')}</div>`}catch(e){console.error(e);root.innerHTML='<div class="level-loading">성장기지 LEVEL 분석을 불러오지 못했습니다. 로그인과 성장기지 권한을 확인해 주세요.</div>'}}
+  document.getElementById('refreshCenterLevel')?.addEventListener('click',load);load();
+})();
