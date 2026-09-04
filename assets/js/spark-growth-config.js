@@ -1,4 +1,4 @@
-// GLOBAL SPARK · SPARK WORLD v2.8.1 · 화면 연출용 자산/분류 매핑
+// GLOBAL SPARK · PHASE 3-1 · v3.1.0 · 화면 연출용 자산/분류 매핑
 (function(){
   const base='assets/spark';
   const flames={
@@ -8,9 +8,13 @@
     CHALLENGE:{code:'CHALLENGE',name:'도전 불꽃',asset:`${base}/flames/challenge.svg`},
     CITIZEN:{code:'CITIZEN',name:'함께 불꽃',asset:`${base}/flames/citizen.svg`}
   };
+  // DB spark_activity_rules.flame_code와 동일한 분류를 유지한다.
+  // 서버가 flame_code를 직접 주는 화면에서는 서버 값을 우선하고,
+  // 기존 센터 RPC처럼 flame_code가 없는 응답의 호환용 fallback으로 사용한다.
   const activityFlame={
     care_friend:'GOOD',help_parents:'GOOD',keep_promise:'GOOD',other_good_action:'GOOD',
     service_share:'CITIZEN',tidy:'CITIZEN',
+    environment_care:'EARTH',
     exercise_challenge:'CHALLENGE',reading_learning:'CHALLENGE',courage:'SAFE'
   };
   const stages=[
