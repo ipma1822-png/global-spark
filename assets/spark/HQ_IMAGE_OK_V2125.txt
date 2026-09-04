@@ -1,0 +1,1 @@
+v2.12.5 uses assets/spark/hq-command-center.svg (high-resolution embedded image) as the public HQ hero image.
