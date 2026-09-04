@@ -3,6 +3,7 @@
   const $=id=>document.getElementById(id),center=new URLSearchParams(location.search).get('center'),selected=new Set();
   const grid=$('memberGrid'),countEl=$('bulkCount'),allBtn=$('bulkSelectAll'),clearBtn=$('bulkClear'),bulkBtn=$('bulkRegisterBtn'),status=$('status');
   if(!center||!grid||!countEl||!allBtn||!clearBtn||!bulkBtn)return;
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   const toolbar=allBtn.parentElement;
   const search=document.createElement('input');
@@ -27,7 +28,7 @@
     const ids=[...selected];
     if(!ids.length){picked.style.display='none';picked.textContent='';return}
     picked.style.display='block';
-    picked.innerHTML='<b>선택된 아이</b> · '+ids.map(id=>`<span style="display:inline-block;margin:3px 4px 0 0;padding:2px 7px;border-radius:999px;background:#ff9f1c16;border:1px solid #ff9f1c44">${nameFor(id)}</span>`).join('');
+    picked.innerHTML='<b>선택된 아이</b> · '+ids.map(id=>`<button type="button" data-remove-id="${esc(id)}" title="선택 해제" style="display:inline-block;margin:3px 4px 0 0;padding:3px 8px;border-radius:999px;background:#ff9f1c16;color:#fff;border:1px solid #ff9f1c44;cursor:pointer">${esc(nameFor(id))} ×</button>`).join('');
   }
   function matchesFilter(id){
     const x=stats.get(id),f=filter.value;
@@ -59,7 +60,6 @@
   grid.addEventListener('change',e=>{const cb=e.target.closest('.bulk-check');if(!cb)return;cb.checked?selected.add(cb.dataset.bulkId):selected.delete(cb.dataset.bulkId);sync(false)});
   allBtn.onclick=()=>{visibleMemberButtons().forEach(b=>selected.add(b.dataset.id));sync(false)};
   clearBtn.onclick=()=>{selected.clear();sync(false)};
-
   picked.addEventListener('click',e=>{const chip=e.target.closest('[data-remove-id]');if(!chip)return;selected.delete(chip.dataset.removeId);sync(false)});
 
   bulkBtn.onclick=async()=>{
@@ -69,7 +69,7 @@
     if(!activeRule){status.textContent='여러 아이에게 줄 좋은 행동을 먼저 선택해 주세요.';return}
     const activityType=activeRule.dataset.type,label=activeRule.querySelector('b')?.textContent||'선택한 활동';
     const xpText=activeRule.querySelector('small')?.textContent||'';
-    const preview=ids.slice(0,12).map(nameFor).join(', ')+(ids.length>12?` 외 ${ids.length-12}명`: '');
+    const preview=ids.slice(0,12).map(nameFor).join(', ')+(ids.length>12?` 외 ${ids.length-12}명`:'');
     if(!confirm(`${ids.length}명에게 동시에 “${label}” ${xpText}를 기록할까요?\n\n대상: ${preview}\n\n선택한 아이 모두에게 같은 활동이 각각 1회 기록됩니다.`))return;
     bulkBtn.disabled=true;bulkBtn.textContent='🔥 일괄 등록 중…';
     try{
