@@ -9,6 +9,6 @@
     if(!res.ok){const e=new Error(typeof body==='string'?body:JSON.stringify(body));e.status=res.status;e.body=body;throw e}return body;
   }
   if(!window.SparkData)window.SparkData={};
-  window.SparkData.getKidDashboard=token=>kidRpc('spark_kid_dashboard_v270',{p_token:token});
-  window.SparkData.registerKidActivity=(token,activityType,memo='')=>kidRpc('spark_kid_register_activity_v270',{p_token:token,p_activity_type:activityType,p_memo:memo});
+  window.SparkData.getKidDashboard=token=>kidRpc('spark_kid_room',{p_token:token});
+  window.SparkData.registerKidActivity=(token,activityType,memo='')=>kidRpc('spark_kid_register_activity',{p_token:token,p_activity_type:activityType,p_memo:memo});
 })();
