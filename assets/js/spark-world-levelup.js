@@ -1,0 +1,9 @@
+// GLOBAL SPARK · GAMEIFICATION 11 · LEVEL UP full-screen sequence
+(function(){
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,g=window.SPARK_GROWTH;let previous=null,ready=false;
+ function overlay(){let o=document.getElementById('levelUpFx');if(o)return o;o=document.createElement('div');o.id='levelUpFx';o.className='levelup-fx';o.setAttribute('aria-live','polite');document.body.appendChild(o);return o}
+ function show(oldState,state){const oldLevel=Number(oldState?.xp?.level||1),level=Number(state?.xp?.level||1),oldStage=oldState?.stage?.key,stage=state?.stage||g?.stageForXp?.(state?.xp?.total||0),stageChanged=oldStage&&stage?.key!==oldStage;if(level<=oldLevel&&!stageChanged)return;const o=overlay(),title=stageChanged?'NEW SPARK EVOLUTION':'LEVEL UP!',sub=stageChanged?`${stage.name} · ${stage.subtitle||'새로운 불꽃으로 성장했어요!'}`:`LEVEL ${level} 달성!`,asset=stage?.asset||'assets/spark/levels/ember.svg';o.innerHTML=`<div class="levelup-space"><i></i><i></i><i></i></div><div class="levelup-card"><small>${title}</small><div class="levelup-level">${stageChanged?'🔥':'⭐'} ${stageChanged?stage.name:'LEVEL '+level}</div><div class="levelup-character"><span></span><img src="${asset}" alt="${stage?.name||'성장 캐릭터'}"></div><b>${sub}</b><p>${stageChanged?'현실에서의 좋은 행동이 나의 불꽃을 한 단계 성장시켰어요.':'좋은 행동을 이어가며 다음 성장단계를 향해 가요!'}</p></div>`;o.classList.remove('show');void o.offsetWidth;o.classList.add('show');setTimeout(()=>{o.classList.remove('show');o.innerHTML=''},reduce?1600:2800)}
+ function onState(state){if(!state)return;if(!ready){previous=state;ready=true;return}show(previous,state);previous=state}
+ document.addEventListener('spark-world:state',e=>onState(e.detail));if(window.SPARK_WORLD_STATE)onState(window.SPARK_WORLD_STATE);
+ window.SPARK_WORLD_LEVELUP={version:'11.0.0',show};
+})();
