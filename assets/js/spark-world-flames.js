@@ -1,0 +1,8 @@
+// GLOBAL SPARK · SPARK WORLD GAMEIFICATION 05 · five living flames
+(function(){
+ const ORDER=['GOOD','SAFE','EARTH','CHALLENGE','CITIZEN'];
+ const WORD={GOOD:'따뜻한 마음',SAFE:'나와 친구를 지키는 힘',EARTH:'지구를 아끼는 마음',CHALLENGE:'끝까지 도전하는 힘',CITIZEN:'함께 살아가는 힘'};
+ function rank(v,max){if(v<=0)return{lv:0,label:'불씨를 깨워보세요'};const ratio=max? v/max:1;if(v>=5||ratio>=.8)return{lv:3,label:'활활 타오르는 불꽃'};if(v>=3||ratio>=.5)return{lv:2,label:'힘차게 자라는 불꽃'};return{lv:1,label:'깨어난 불꽃'}}
+ function render(state){const grid=document.getElementById('flameGrid'),g=window.SPARK_GROWTH;if(!grid||!g)return;const counts=state?.flames||{},max=Math.max(1,...ORDER.map(k=>Number(counts[k]||0)));grid.innerHTML=ORDER.map((k,i)=>{const f=g.flames[k],v=Number(counts[k]||0),r=rank(v,max),pct=v?Math.max(18,Math.round(v/max*100)):5;return `<button type="button" class="flame-card living-flame flame-${k.toLowerCase()} level-${r.lv}" data-flame="${k}" aria-label="${f.name} ${v}회"><span class="flame-rune">${f.emoji}</span><span class="flame-orb"><img src="${f.asset}" alt=""><i class="flame-energy" style="--energy:${pct}%"></i></span><b>${f.name}</b><strong>${v}</strong><small>${r.label}</small><em>${WORD[k]}</em></button>`}).join('');grid.querySelectorAll('.living-flame').forEach((el,i)=>{el.style.setProperty('--delay',`${i*.16}s`);el.onclick=()=>{grid.querySelectorAll('.living-flame').forEach(x=>x.classList.remove('flame-focus'));el.classList.add('flame-focus');setTimeout(()=>el.classList.remove('flame-focus'),1200)}})}
+ document.addEventListener('spark-world:state',e=>render(e.detail));if(window.SPARK_WORLD_STATE)render(window.SPARK_WORLD_STATE);
+})();
