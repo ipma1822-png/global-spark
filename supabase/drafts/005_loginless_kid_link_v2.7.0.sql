@@ -1,0 +1,42 @@
+-- GLOBAL SPARK · 아이 개인링크 v2.7.0
+-- IMPORTANT: DRAFT ONLY. Do not auto-run until the independent GLOBAL SPARK Supabase project is connected and its live schema/functions are inspected.
+-- Product rule fixed on 2026-09-04:
+--   1) 아이는 로그인하지 않는다.
+--   2) 난수 개인링크로 자기 불꽃방에 들어간다.
+--   3) 아이가 활동을 등록하면 XP는 즉시 반영된다. 승인 대기 없음.
+--   4) 센터 지도자는 승인자가 아니라 사후 감독자다.
+--   5) 센터에서는 누가/언제/어떤 활동으로/몇 XP를 올렸는지 최근 활동에서 확인한다.
+--   6) 이상 기록만 UNDO/정정 대상으로 처리한다.
+--
+-- Browser RPC contract already used by spark-room-data.js:
+--   spark_kid_dashboard_v270(p_token text)
+--   spark_kid_register_activity_v270(p_token text, p_activity_type text, p_memo text)
+--
+-- Required live-schema review before converting this draft into a migration:
+--   * current spark_members columns / center relation
+--   * current activity rule table and XP source of truth
+--   * current append-only ledger/activity tables
+--   * exact implementation of spark_center_register_activity_v190
+--   * current member summary/recent RPC result shapes
+--   * RLS and SECURITY DEFINER ownership
+--
+-- Security requirements:
+--   * token must be random and non-guessable; never expose member_code/name in the URL
+--   * token stores only a hash if possible
+--   * token can be revoked/rotated by center staff
+--   * public dashboard exposes only child-safe fields (display name, XP, level, growth, recent SPARK)
+--   * phone, email, birth date, guardian info, addresses must never be returned
+--   * browser may choose activity_type but may NEVER submit arbitrary XP
+--   * XP must always be resolved server-side from the existing official activity rules
+--   * duplicate rapid submissions need idempotency/rate protection
+--
+-- Recommended tables/functions after live inspection:
+--   spark_kid_links(id, member_id, token_hash, status, created_at, revoked_at, last_used_at)
+--   spark_kid_dashboard_v270(token)
+--   spark_kid_register_activity_v270(token, activity_type, memo)
+--   spark_center_kid_link_create_v270(member_id)
+--   spark_center_kid_link_revoke_v270(member_id)
+--
+-- The register RPC must write to the SAME existing activity + ledger path used by CENTER,
+-- not a second XP system. That preserves current level calculations, 5 flames, recent log,
+-- center monitoring, append-only ledger and UNDO behavior.
