@@ -1,4 +1,4 @@
-// GLOBAL SPARK · SPARK WORLD v2.8.1
+// GLOBAL SPARK · PHASE 3-1 · v3.1.0
 (async function(){
   const $=id=>document.getElementById(id);
   const params=new URLSearchParams(location.search);
@@ -10,9 +10,9 @@
   const growth=window.SPARK_GROWTH;
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  document.title='SPARK WORLD · GLOBAL SPARK v2.8.1';
+  document.title='SPARK WORLD · GLOBAL SPARK v3.1.0';
   const versionEl=document.querySelector('.world-version');
-  if(versionEl)versionEl.textContent='PHASE 2-8 · v2.8.1';
+  if(versionEl)versionEl.textContent='PHASE 3-1 · v3.1.0';
   const style=document.createElement('style');
   style.textContent=`
     .road .stage{opacity:1;overflow:hidden;position:relative;background:linear-gradient(160deg,#111b32,#091123);border:1px solid #31405b;transition:.28s ease;min-height:150px}
@@ -68,12 +68,12 @@
   }
   function renderFlames(rows){
     const counts={GOOD:0,SAFE:0,EARTH:0,CHALLENGE:0,CITIZEN:0};
-    (rows||[]).forEach(r=>{const code=growth.activityFlame[r.activity_type]||'GOOD';if(Number(r.net_xp??r.xp??0)>0)counts[code]=(counts[code]||0)+1});
+    (rows||[]).forEach(r=>{const code=r.flame_code||growth.activityFlame[r.activity_type]||'GOOD';if(Number(r.net_xp??r.xp??0)>0)counts[code]=(counts[code]||0)+1});
     const order=['GOOD','SAFE','EARTH','CHALLENGE','CITIZEN'];
     $('flameGrid').innerHTML=order.map(code=>{const f=growth.flames[code];return `<div class="flame-card"><img src="${esc(f.asset)}?v=281" alt="${esc(f.name)}"><b>${esc(f.name)}</b><strong>${counts[code]||0}</strong></div>`}).join('');
   }
   function renderRules(){
-    $('actions').innerHTML=rules.map(r=>`<button type="button" class="action ${selected===r.activity_type?'selected':''}" data-type="${esc(r.activity_type)}"><strong>${esc(r.label_ko)}</strong><span>+${Number(r.xp||0)} XP · ${esc(growth.flames[r.flame_code]?.name||'불꽃')}</span></button>`).join('')||'<p class="help">지금 선택할 수 있는 활동이 없습니다.</p>';
+    $('actions').innerHTML=rules.map(r=>{const code=r.flame_code||growth.activityFlame[r.activity_type]||'GOOD';return `<button type="button" class="action ${selected===r.activity_type?'selected':''}" data-type="${esc(r.activity_type)}"><strong>${esc(r.label_ko)}</strong><span>+${Number(r.xp||0)} XP · ${esc(growth.flames[code]?.name||'불꽃')}</span></button>`}).join('')||'<p class="help">지금 선택할 수 있는 활동이 없습니다.</p>';
   }
   function renderRecent(rows){
     lastRecent=rows||[];renderFlames(lastRecent);
