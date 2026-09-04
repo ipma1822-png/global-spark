@@ -1,4 +1,4 @@
-// GLOBAL SPARK · loginless kid-link adapter v2.7.0
+// GLOBAL SPARK · loginless kid-link adapter · PHASE 3-18
 (function(){
   const cfg=window.SPARK_CONFIG||{};
   async function kidRpc(name,payload={}){
@@ -11,4 +11,6 @@
   if(!window.SparkData)window.SparkData={};
   window.SparkData.getKidDashboard=token=>kidRpc('spark_kid_room',{p_token:token});
   window.SparkData.registerKidActivity=(token,activityType,memo='')=>kidRpc('spark_kid_register_activity',{p_token:token,p_activity_type:activityType,p_memo:memo});
+  window.SparkData.getKidCampaigns=token=>kidRpc('spark_kid_campaigns',{p_token:token});
+  window.SparkData.completeKidCampaignAction=(token,campaignId,memo='')=>kidRpc('spark_kid_complete_campaign_action',{p_token:token,p_campaign_id:campaignId,p_memo:memo});
 })();
