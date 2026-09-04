@@ -1,16 +1,23 @@
+// GLOBAL SPARK PHASE 3-7 · v3.7.0
 (function(){
-  const $=id=>document.getElementById(id);
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const pLabels={solo:'혼자',friends:'친구와',family:'가족과',center:'센터와',community:'지역사회와'};
+  const flameLabels={GOOD:'🔥 착한',SAFE:'🛡️ 안전',EARTH:'🌿 환경',CHALLENGE:'⛰️ 도전',CITIZEN:'🤝 함께'};
+  function ago(v){const s=Math.max(0,Math.floor((Date.now()-new Date(v).getTime())/1000));if(s<60)return '방금 전';if(s<3600)return Math.floor(s/60)+'분 전';if(s<86400)return Math.floor(s/3600)+'시간 전';return Math.floor(s/86400)+'일 전'}
   async function load(){
     $('refreshLiveBtn').disabled=true;
     try{
-      const [d,missions]=await Promise.all([SparkData.getPublicLive(),SparkData.publicMissions(6)]);
+      const [d,missions]=await Promise.all([SparkData.publicRpc('spark_get_public_live_v370',{}),SparkData.publicMissions(6)]);
       $('liveToday').textContent=d.today_count||0;$('liveWeek').textContent=d.week_count||0;$('liveCenters').textContent=d.active_centers||0;$('liveXp').textContent=d.total_xp||0;
-      const rows=Array.isArray(d.centers)?d.centers:[];
-      $('centerLiveBoard').innerHTML=rows.length?rows.map(r=>`<div class="live-row"><div><b>🔥 ${esc(r.center_name)}</b><small>${esc(r.region_name||'')} · 오늘 ${r.today_count} SPARK · 이번 주 ${r.week_count} SPARK</small></div><div class="live-xp">${r.total_xp} XP</div></div>`).join(''):'<p class="empty">아직 공개할 센터 활동이 없습니다.</p>';
-      $('publicMissionList').innerHTML=missions.length?missions.map(m=>`<article class="public-mission"><div><span class="flame-tag">${esc(m.flame_code)}</span><h3>${esc(m.title)}</h3><p>${esc(m.description)}</p>${m.safety_guide?`<small>🛡 ${esc(m.safety_guide)}</small>`:''}</div><div><b>${esc(m.target_label||'모두')}</b><small>${esc(pLabels[m.participation_type]||m.participation_type)} · ${esc(m.difficulty)}</small></div></article>`).join(''):'<p class="empty">현재 공개된 MISSION이 없습니다.</p>';
-    }catch(e){console.error(e);$('centerLiveBoard').innerHTML='<p class="empty">SPARK LIVE 데이터를 불러오지 못했습니다.</p>';$('publicMissionList').innerHTML='<p class="empty">MISSION을 불러오지 못했습니다.</p>';}finally{$('refreshLiveBtn').disabled=false;}
+      const events=Array.isArray(d.live_events)?d.live_events:[];
+      $('liveFlow').innerHTML=events.length?events.slice(0,20).map(r=>`<div class="flow-row"><div><b>${flameLabels[r.flame_code]||'🔥 SPARK'} · ${esc(r.label_ko)}</b><small>${esc(r.center_name)} · ${esc(r.country_code||'--')} ${esc(r.region_name||'')}</small></div><div class="live-xp">${ago(r.created_at)}</div></div>`).join(''):'<p class="empty">아직 공개할 최근 활동이 없습니다.</p>';
+      const tickerItems=events.slice(0,12).map(r=>`${flameLabels[r.flame_code]||'🔥'} ${esc(r.center_name)} · ${esc(r.label_ko)}`);const doubled=[...tickerItems,...tickerItems];$('liveTicker').innerHTML=doubled.length?doubled.map(x=>`<span>${x}</span>`).join(''):'<span>🔥 새로운 SPARK를 기다리고 있습니다.</span>';
+      const f=d.flames_7d||{};$('flameLive').innerHTML=Object.keys(flameLabels).map(k=>`<div class="flame-card"><b>${flameLabels[k]}</b><strong>${f[k]||0}</strong><small>최근 7일</small></div>`).join('');
+      const countries=Array.isArray(d.countries)?d.countries:[];$('countryLive').innerHTML=countries.length?countries.map(x=>`<div class="country-chip"><b>${esc(x.country_code)}</b> · ${x.centers}센터 · 7일 ${x.week_count}회</div>`).join(''):'<span class="empty">국가별 데이터 준비 중</span>';
+      const rows=Array.isArray(d.centers)?d.centers:[];$('centerLiveBoard').innerHTML=rows.length?rows.map(r=>`<div class="live-row"><div><b>🔥 ${esc(r.center_name)}</b><small>${esc(r.country_code||'--')} ${esc(r.region_name||'')} · 오늘 ${r.today_count} SPARK · 최근 7일 ${r.week_count} SPARK</small></div><div class="live-xp">${r.total_xp} XP</div></div>`).join(''):'<p class="empty">아직 공개할 센터 활동이 없습니다.</p>';
+      $('publicMissionList').innerHTML=missions.length?missions.map(m=>`<article class="public-mission"><div><span class="flame-tag">${flameLabels[m.flame_code]||esc(m.flame_code)}</span><h3>${esc(m.title)}</h3><p>${esc(m.description)}</p>${m.safety_guide?`<small>🛡 ${esc(m.safety_guide)}</small>`:''}</div><div><b>${esc(m.target_label||'모두')}</b><small>${esc(pLabels[m.participation_type]||m.participation_type)} · ${esc(m.difficulty)}</small></div></article>`).join(''):'<p class="empty">현재 공개된 MISSION이 없습니다.</p>';
+    }catch(e){console.error(e);$('liveFlow').innerHTML='<p class="empty">SPARK LIVE 흐름을 불러오지 못했습니다.</p>';$('centerLiveBoard').innerHTML='<p class="empty">센터 데이터를 불러오지 못했습니다.</p>';$('publicMissionList').innerHTML='<p class="empty">MISSION을 불러오지 못했습니다.</p>'}
+    finally{$('refreshLiveBtn').disabled=false}
   }
-  $('refreshLiveBtn').onclick=load;load();
+  $('refreshLiveBtn').onclick=load;load();setInterval(load,60000);
 })();
