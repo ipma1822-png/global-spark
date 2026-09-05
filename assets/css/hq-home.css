@@ -5,3 +5,11 @@
 @media(min-width:981px){.hero{padding:0;background:#020b18}.hero-inner{max-width:1600px;display:block}.hero-copy{display:none}.hero-placeholder{width:100%;aspect-ratio:16/9;min-height:0;border:0;border-radius:0;padding:0;background:#020b18 url('../spark/hero-main.png?v=3320') center center/cover no-repeat;box-shadow:none}.hero-placeholder .placeholder-art{display:none}.quick{margin-top:0}}
 @media(max-width:980px){.hero{padding:0;background:#020b18}.hero-inner{display:block;max-width:none}.hero-copy{display:none}.hero-placeholder{width:100%;aspect-ratio:16/10;min-height:0;border:0;border-radius:0;padding:0;background:#020b18 url('../spark/hero-main.png?v=3320') center center/contain no-repeat;box-shadow:none}.hero-placeholder .placeholder-art{display:none}}
 @media(max-width:560px){.hero-placeholder{aspect-ratio:16/10;background-size:contain;background-position:center top}}
+
+/* SPARK PAGE BANNERS · B04/B05 · v3.65.2 */
+body>main>.intro:first-child:before,body>main>.guide:first-child:before{content:"";display:block;width:100%;aspect-ratio:16/7;margin:0 0 30px;border-radius:28px;border:1px solid #65dcff35;background-position:center;background-size:cover;background-repeat:no-repeat;box-shadow:0 26px 72px #0009,0 0 38px #54d8ff14;transition:transform .55s ease,box-shadow .55s ease}
+body>main>.intro:first-child:before{background-image:linear-gradient(180deg,rgba(3,17,38,.02),rgba(3,17,38,.32)),url('../spark/banners/B05.webp')}
+body>main>.guide:first-child:before{background-image:linear-gradient(180deg,rgba(3,17,38,.02),rgba(3,17,38,.30)),url('../spark/banners/B04.webp')}
+body>main>.intro:first-child:hover:before,body>main>.guide:first-child:hover:before{transform:translateY(-2px) scale(1.006);box-shadow:0 30px 82px #000a,0 0 48px #54d8ff1c}
+@media(max-width:700px){body>main>.intro:first-child:before,body>main>.guide:first-child:before{aspect-ratio:16/10;margin-bottom:20px;border-radius:20px;background-position:center}}
+@media(prefers-reduced-motion:reduce){body>main>.intro:first-child:before,body>main>.guide:first-child:before{transition:none}body>main>.intro:first-child:hover:before,body>main>.guide:first-child:hover:before{transform:none}}
