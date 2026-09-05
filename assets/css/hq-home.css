@@ -13,3 +13,9 @@ body>main>.guide:first-child:before{background-image:linear-gradient(180deg,rgba
 body>main>.intro:first-child:hover:before,body>main>.guide:first-child:hover:before{transform:translateY(-2px) scale(1.006);box-shadow:0 30px 82px #000a,0 0 48px #54d8ff1c}
 @media(max-width:700px){body>main>.intro:first-child:before,body>main>.guide:first-child:before{aspect-ratio:16/10;margin-bottom:20px;border-radius:20px;background-position:center}}
 @media(prefers-reduced-motion:reduce){body>main>.intro:first-child:before,body>main>.guide:first-child:before{transition:none}body>main>.intro:first-child:hover:before,body>main>.guide:first-child:hover:before{transform:none}}
+
+/* SPARK RANKING · B09 cinematic banner · v3.65.3 */
+body:has(#centerBoard) main.wrap:before{content:"";display:block;width:100%;aspect-ratio:16/7;margin:0 0 30px;border-radius:28px;border:1px solid #65dcff35;background-image:linear-gradient(180deg,rgba(3,17,38,.02),rgba(3,17,38,.32)),url('../spark/banners/ChatGPT%20Image%202026%23Ub144%209%23Uc6d4%205%23Uc77c%20%23Uc624%23Uc804%2009_02_23.webp');background-position:center;background-size:cover;background-repeat:no-repeat;box-shadow:0 26px 72px #0009,0 0 38px #54d8ff14;transition:transform .55s ease,box-shadow .55s ease}
+body:has(#centerBoard) main.wrap:hover:before{transform:translateY(-2px) scale(1.006);box-shadow:0 30px 82px #000a,0 0 48px #54d8ff1c}
+@media(max-width:700px){body:has(#centerBoard) main.wrap:before{aspect-ratio:16/10;margin-bottom:20px;border-radius:20px;background-position:center}}
+@media(prefers-reduced-motion:reduce){body:has(#centerBoard) main.wrap:before{transition:none}body:has(#centerBoard) main.wrap:hover:before{transform:none}}
