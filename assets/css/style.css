@@ -11,3 +11,12 @@ body>main.wrap>.head+.hero:before{content:"";display:block;width:100%;aspect-rat
 body>main.wrap>.head+.hero:hover:before{transform:translateY(-2px) scale(1.006);box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 44px rgba(84,216,255,.16)}
 @media(max-width:700px){body>main.wrap>.head+.hero{padding-top:22px}body>main.wrap>.head+.hero:before{aspect-ratio:16/10;margin-bottom:20px;border-radius:19px;background-position:center}}
 @media(prefers-reduced-motion:reduce){body>main.wrap>.head+.hero:before{transition:none}body>main.wrap>.head+.hero:hover:before{transform:none}}
+
+/* SPARK PAGE BANNERS · B06/B07/B08 · v3.65.3 */
+body:has(#refreshCenterLevel) main.wrap:before,body:has(#q) main.wrap:before,body:has(#campaigns) main.wrap:before{content:"";display:block;width:100%;aspect-ratio:16/7;margin:8px 0 24px;border-radius:26px;border:1px solid #66dcff33;background-position:center;background-size:cover;background-repeat:no-repeat;box-shadow:0 24px 68px rgba(0,0,0,.48),0 0 36px rgba(84,216,255,.10);transition:transform .55s ease,box-shadow .55s ease}
+body:has(#refreshCenterLevel) main.wrap:before{background-image:linear-gradient(180deg,rgba(3,17,38,.03),rgba(3,17,38,.34)),url('../spark/banners/ChatGPT%20Image%202026%23Ub144%209%23Uc6d4%205%23Uc77c%20%23Uc624%23Uc804%2009_01_24.webp')}
+body:has(#q) main.wrap:before{background-image:linear-gradient(180deg,rgba(3,17,38,.02),rgba(3,17,38,.32)),url('../spark/banners/ChatGPT%20Image%202026%23Ub144%209%23Uc6d4%205%23Uc77c%20%23Uc624%23Uc804%2009_01_41.webp')}
+body:has(#campaigns) main.wrap:before{background-image:linear-gradient(180deg,rgba(3,17,38,.02),rgba(3,17,38,.32)),url('../spark/banners/ChatGPT%20Image%202026%23Ub144%209%23Uc6d4%205%23Uc77c%20%23Uc624%23Uc804%2009_01_51.webp')}
+body:has(#refreshCenterLevel) main.wrap:hover:before,body:has(#q) main.wrap:hover:before,body:has(#campaigns) main.wrap:hover:before{transform:translateY(-2px) scale(1.005);box-shadow:0 28px 78px rgba(0,0,0,.54),0 0 46px rgba(84,216,255,.15)}
+@media(max-width:700px){body:has(#refreshCenterLevel) main.wrap:before,body:has(#q) main.wrap:before,body:has(#campaigns) main.wrap:before{aspect-ratio:16/10;margin:4px 0 18px;border-radius:19px;background-position:center}}
+@media(prefers-reduced-motion:reduce){body:has(#refreshCenterLevel) main.wrap:before,body:has(#q) main.wrap:before,body:has(#campaigns) main.wrap:before{transition:none}body:has(#refreshCenterLevel) main.wrap:hover:before,body:has(#q) main.wrap:hover:before,body:has(#campaigns) main.wrap:hover:before{transform:none}}
