@@ -4,3 +4,10 @@
 /* GLOBAL SPARK PHASE 2-6 · v2.6.0 · visible version marker */
 .version-pill{font-size:0}.version-pill::after{content:"PHASE 2-6 · v2.6.0";font-size:12px;letter-spacing:.05em}
 @media(max-width:520px){body{overflow-x:hidden}main.container{width:100%;max-width:100%;overflow-x:hidden}.hero-card,.hero-card>div{min-width:0;max-width:100%}.hero-card .hero-visual{min-height:0!important;height:auto!important;padding-top:6px!important}.hero-card .spark-flame{display:block!important;width:150px!important;height:150px!important;max-width:48vw!important;margin:0 auto 4px!important;object-fit:contain!important}.hero-card .stage-track{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}.hero-card .stage-step{flex:0 0 104px}.hero-card p,.hero-card h2{max-width:100%;overflow-wrap:break-word}.section-title-row h2{font-size:clamp(1.9rem,9vw,2.55rem)!important;line-height:1.16;word-break:keep-all;overflow-wrap:break-word}.next-action{max-width:100%}.flame-grid{max-width:100%}}
+
+/* OFFICIAL GROWTH BASE · B02 cinematic banner · v3.65.2 */
+body>main.wrap>.head+.hero{min-height:0;display:block;justify-content:initial;padding:34px 0 12px;background:none}
+body>main.wrap>.head+.hero:before{content:"";display:block;width:100%;aspect-ratio:16/7;margin:4px 0 30px;border-radius:26px;border:1px solid #66dcff38;background:linear-gradient(180deg,rgba(3,17,38,.04),rgba(3,17,38,.35)),url('../spark/banners/B02.webp') center/cover no-repeat;box-shadow:0 26px 70px rgba(0,0,0,.48),0 0 36px rgba(84,216,255,.11);transition:transform .55s ease,box-shadow .55s ease}
+body>main.wrap>.head+.hero:hover:before{transform:translateY(-2px) scale(1.006);box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 44px rgba(84,216,255,.16)}
+@media(max-width:700px){body>main.wrap>.head+.hero{padding-top:22px}body>main.wrap>.head+.hero:before{aspect-ratio:16/10;margin-bottom:20px;border-radius:19px;background-position:center}}
+@media(prefers-reduced-motion:reduce){body>main.wrap>.head+.hero:before{transition:none}body>main.wrap>.head+.hero:hover:before{transform:none}}
